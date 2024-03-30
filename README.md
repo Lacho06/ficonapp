@@ -11,5 +11,6 @@
   - routes [ rutas-url ]
   - types [ tipos de ts ]
 }
-- routers [ rutas ]
+- hooks [ customHooks ]
+- router [ rutas ]
 - pages [ paginas ]
