@@ -1,5 +1,5 @@
 import { CustomFlowbiteTheme, Sidebar } from "flowbite-react"
-import { ROUTE_ADMIN_PANEL_URL, ROUTE_USERS_URL } from "../constants/routes/routes";
+import { ROUTE_ADMIN_PANEL_URL, ROUTE_OCCUPATION_URL, ROUTE_USERS_URL, ROUTE_WORKERS_URL } from "../constants/routes/routes";
 
 import { Link } from 'react-router-dom';
 
@@ -28,12 +28,12 @@ const SideBar = () => {
                             Usuarios
                         </Sidebar.Item>
                     </Link>
-                    <Link to={ROUTE_ADMIN_PANEL_URL}>
+                    <Link to={ROUTE_WORKERS_URL}>
                         <Sidebar.Item>
                             Plantilla
                         </Sidebar.Item>
                     </Link>
-                    <Link to={ROUTE_ADMIN_PANEL_URL}>
+                    <Link to={ROUTE_OCCUPATION_URL}>
                         <Sidebar.Item>
                             Cargos
                         </Sidebar.Item>

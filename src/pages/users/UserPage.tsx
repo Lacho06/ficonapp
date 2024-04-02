@@ -1,4 +1,4 @@
-import { Avatar, Breadcrumb, Button, CustomFlowbiteTheme, FileInput, Label, Modal, Select, Table, TextInput } from "flowbite-react"
+import { Breadcrumb, Button, CustomFlowbiteTheme, FileInput, Label, Modal, Select, Table, TextInput } from "flowbite-react"
 import { NewUser, User } from "../../constants/types/user"
 import { ROUTE_HOME_URL, ROUTE_USERS_URL } from "../../constants/routes/routes";
 import { useEffect, useState } from "react"
@@ -35,9 +35,7 @@ const UserPage = () => {
 
     useEffect(() => {
         // llamada a la api
-        axios.get(GET_LIST_USERS).then(data => {
-            setUsers(data.data)
-        })
+        axios.get(GET_LIST_USERS).then(({data}) => setUsers(data))
     }, [])
     
     const [openModalAdd, setOpenModalAdd] = useState(false)
@@ -67,7 +65,7 @@ const UserPage = () => {
     }
 
     const createNewUser = () => {
-        // todo validar los datos
+        // validar los datos
         let newError = {
             name: '',
             email: '',
@@ -139,7 +137,7 @@ const UserPage = () => {
 
     const editUser = () => {
         if(!userSelected)return
-        // todo validar los datos
+        // validar los datos
         let newError = {
             name: '',
             email: '',
@@ -244,7 +242,7 @@ const UserPage = () => {
                             <Link to={ROUTE_USERS_URL}>Usuarios</Link>
                         </Breadcrumb.Item>
                     </Breadcrumb>
-                    <Button color="success" onClick={() => setOpenModalAdd(true)}>Agregar usuario</Button>
+                    <Button color="success" size='xs' onClick={() => setOpenModalAdd(true)}>Agregar usuario</Button>
                 </div>
                 <Table theme={customTheme}>
                     <Table.Head>
@@ -260,15 +258,14 @@ const UserPage = () => {
                                     <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                                         {user.id}
                                     </Table.Cell>
-                                    <Table.Cell className="flex items-center gap-2">
-                                        <Avatar img="http://github.com/Lacho06.png" size="xs" alt="avatar of Jese" rounded />
+                                    <Table.Cell className="flex items-center gap-4 font-medium">
                                         {user.name}
                                     </Table.Cell>
                                     <Table.Cell>
                                         {user.email}
                                     </Table.Cell>
                                     <Table.Cell className="flex gap-4">
-                                        <button type="button" onClick={() => handleEdit(user)} className="font-medium text-cyan-600 dark:text-cyan-500">
+                                        <button type="button" onClick={() => handleEdit(user)} className="font-medium text-yellow-300 dark:text-yellow-400">
                                             Editar
                                         </button>
                                         <button type="button" onClick={() => handleDelete(user)} className="font-medium text-red-600 dark:text-cyan-500">
@@ -294,7 +291,7 @@ const UserPage = () => {
                         <h3 className="text-xl font-medium text-gray-900 dark:text-white">Agregar nuevo usuario</h3>
                         <div>
                             <div className="mb-2 block">
-                                <Label htmlFor="name" value="Tu nombre" />
+                                <Label htmlFor="name" value="Nombre" />
                                 <span className="text-red-800 mx-1 font-bold">*</span>
                             </div>
                             <TextInput
@@ -316,7 +313,7 @@ const UserPage = () => {
                         </div>
                         <div>
                             <div className="mb-2 block">
-                                <Label htmlFor="email" value="Tu correo electrónico" />
+                                <Label htmlFor="email" value="Correo electrónico" />
                                 <span className="text-red-800 mx-1 font-bold">*</span>
                             </div>
                             <TextInput
@@ -338,7 +335,7 @@ const UserPage = () => {
                         </div>
                         <div>
                             <div className="mb-2 block">
-                                <Label htmlFor="password" value="Tu contraseña" />
+                                <Label htmlFor="password" value="Contraseña" />
                                 <span className="text-red-800 mx-1 font-bold">*</span>
                             </div>
                             <TextInput
@@ -360,7 +357,7 @@ const UserPage = () => {
                         </div>
                         <div>
                             <div className="mb-2 block">
-                                <Label htmlFor="role" value="Tu rol" />
+                                <Label htmlFor="role" value="Rol" />
                                 <span className="text-red-800 mx-1 font-bold">*</span>
                             </div>
                             <Select id="role" name="role" required onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setNewUser({ ...newUser, [e.target.name]: e.target.value })}>
@@ -370,7 +367,7 @@ const UserPage = () => {
                         </div>
                         <div>
                             <div className="mb-2 block">
-                                <Label htmlFor="image" value="Tu foto de perfil" />
+                                <Label htmlFor="image" value="Foto de perfil" />
                             </div>
                             <FileInput
                                 id="image"
@@ -397,7 +394,7 @@ const UserPage = () => {
                         <h3 className="text-xl font-medium text-gray-900 dark:text-white">Editar usuario { userSelected && userSelected.name }</h3>
                         <div>
                             <div className="mb-2 block">
-                                <Label htmlFor="name" value="Tu nombre" />
+                                <Label htmlFor="name" value="Nombre" />
                                 <span className="text-red-800 mx-1 font-bold">*</span>
                             </div>
                             <TextInput
@@ -419,7 +416,7 @@ const UserPage = () => {
                         </div>
                         <div>
                             <div className="mb-2 block">
-                                <Label htmlFor="email" value="Tu correo electrónico" />
+                                <Label htmlFor="email" value="Correo electrónico" />
                                 <span className="text-red-800 mx-1 font-bold">*</span>
                             </div>
                             <TextInput
@@ -441,7 +438,7 @@ const UserPage = () => {
                         </div>
                         <div>
                             <div className="mb-2 block">
-                                <Label htmlFor="password" value="Tu contraseña" />
+                                <Label htmlFor="password" value="Contraseña" />
                                 <span className="text-red-800 mx-1 font-bold">*</span>
                             </div>
                             <TextInput
@@ -463,17 +460,17 @@ const UserPage = () => {
                         </div>
                         <div>
                             <div className="mb-2 block">
-                                <Label htmlFor="role" value="Tu rol" />
+                                <Label htmlFor="role" value="Rol" />
                                 <span className="text-red-800 mx-1 font-bold">*</span>
                             </div>
                             <Select id="role" name="role" required onChange={(e: React.ChangeEvent<HTMLSelectElement>) => userSelected && setUserSelected({ ...userSelected, [e.target.name]: e.target.value })}>
                                 <option value="user" defaultChecked={userSelected && userSelected.role === 'user'}>User</option>
-                                <option value="admin" defaultChecked={userSelected && userSelected.role === 'admin'} disabled>Admin</option>
+                                <option value="admin" defaultChecked={userSelected && userSelected.role === 'admin'}>Admin</option>
                             </Select>
                         </div>
                         <div>
                             <div className="mb-2 block">
-                                <Label htmlFor="image" value="Tu foto de perfil" />
+                                <Label htmlFor="image" value="Foto de perfil" />
                             </div>
                             <FileInput
                                 id="image"

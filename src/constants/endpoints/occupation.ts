@@ -1,0 +1,1 @@
+export const GET_LIST_OCCUPATIONS = 'http://localhost/ficonapi/public/api/occupations'

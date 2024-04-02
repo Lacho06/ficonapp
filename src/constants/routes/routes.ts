@@ -17,14 +17,16 @@ export const ROUTE_ADMIN_PANEL_URL = '/admin'
 // users routes
 export const ROUTE_USERS_URL = '/admin/users'
 
-// workers template routes
-// export const ROUTE_WORKERS_TEMPLATE_URL = '/admin/workers-template'
+// workers routes
+export const ROUTE_WORKERS_URL = '/admin/workers'
+export const ROUTE_WORKER_DETAILS_PREFIX = '/admin/workers'
+export const ROUTE_WORKER_DETAILS_URL = `${ROUTE_WORKER_DETAILS_PREFIX}/:code`
 
 // department routes
 // export const ROUTE_DEPARTMENT_URL = '/admin/department'
 
-// department routes
+// area routes
 // export const ROUTE_AREA_URL = '/admin/area'
 
 // occupation routes
-// export const ROUTE_OCCUPATION_URL = '/admin/occupation'
+export const ROUTE_OCCUPATION_URL = '/admin/occupations'
