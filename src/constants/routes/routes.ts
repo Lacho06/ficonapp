@@ -22,11 +22,11 @@ export const ROUTE_WORKERS_URL = '/admin/workers'
 export const ROUTE_WORKER_DETAILS_PREFIX = '/admin/workers'
 export const ROUTE_WORKER_DETAILS_URL = `${ROUTE_WORKER_DETAILS_PREFIX}/:code`
 
+// occupation routes
+export const ROUTE_OCCUPATIONS_URL = '/admin/occupations'
+
 // department routes
-// export const ROUTE_DEPARTMENT_URL = '/admin/department'
+export const ROUTE_DEPARTMENTS_URL = '/admin/departments'
 
 // area routes
-// export const ROUTE_AREA_URL = '/admin/area'
-
-// occupation routes
-export const ROUTE_OCCUPATION_URL = '/admin/occupations'
+export const ROUTE_AREAS_URL = '/admin/areas'

@@ -1,0 +1,1 @@
+export const GET_LIST_AREAS = 'http://localhost/ficonapi/public/api/areas'

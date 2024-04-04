@@ -1,7 +1,7 @@
 import { Breadcrumb, Button, CustomFlowbiteTheme, Label, Modal, Table, TextInput } from "flowbite-react"
 import { HiHome, HiOutlineExclamationCircle } from 'react-icons/hi';
 import { NewOccupation, Occupation } from "../../constants/types/occupation"
-import { ROUTE_HOME_URL, ROUTE_OCCUPATION_URL } from "../../constants/routes/routes"
+import { ROUTE_HOME_URL, ROUTE_OCCUPATIONS_URL } from "../../constants/routes/routes"
 import { useEffect, useState } from "react"
 
 import { ERROR_MESSAGES } from "../../constants/app"
@@ -167,8 +167,8 @@ const OccupationPage = () => {
     const deleteOccupation = () => {
         if(!occupationSelected)return
         // todo llamada a la api para eliminar el cargo
-        const occupationFiltered = occupations.filter(occupation => occupation.id !== occupationSelected.id)
-        setOccupations(occupationFiltered)
+        const occupationsFiltered = occupations.filter(occupation => occupation.id !== occupationSelected.id)
+        setOccupations(occupationsFiltered)
         setOccupationSelected(undefined)
         closeModalDelete()
     }
@@ -197,7 +197,7 @@ const OccupationPage = () => {
                             <Link to={ROUTE_HOME_URL}>Inicio</Link>
                         </Breadcrumb.Item>
                         <Breadcrumb.Item>
-                            <Link to={ROUTE_OCCUPATION_URL}>Cargos</Link>
+                            <Link to={ROUTE_OCCUPATIONS_URL}>Cargos</Link>
                         </Breadcrumb.Item>
                     </Breadcrumb>
                     <Button color="success" size='xs' onClick={() => setOpenModalAdd(true)}>Agregar cargo</Button>
@@ -364,7 +364,7 @@ const OccupationPage = () => {
                 <div className="text-center">
                     <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
                     <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                        ¿Estás seguro de eliminar al usuario {occupationSelected && occupationSelected.name}?
+                        ¿Estás seguro de eliminar el cargo {occupationSelected && occupationSelected.name}?
                     </h3>
                     <div className="flex justify-center gap-4">
                         <Button color="failure" onClick={deleteOccupation}>

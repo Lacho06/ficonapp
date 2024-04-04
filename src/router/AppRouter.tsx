@@ -1,9 +1,11 @@
 import { AuthProvider, RequireAuth } from "react-auth-utils"
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom"
-import { ROUTE_ADMIN_PANEL_URL, ROUTE_HOME_URL, ROUTE_LOGIN_URL, ROUTE_OCCUPATION_URL, ROUTE_PAYROLL_URL, ROUTE_USERS_URL, ROUTE_WORKERS_URL, ROUTE_WORKER_DETAILS_URL } from "../constants/routes/routes"
+import { ROUTE_ADMIN_PANEL_URL, ROUTE_AREAS_URL, ROUTE_DEPARTMENTS_URL, ROUTE_HOME_URL, ROUTE_LOGIN_URL, ROUTE_OCCUPATIONS_URL, ROUTE_PAYROLL_URL, ROUTE_USERS_URL, ROUTE_WORKERS_URL, ROUTE_WORKER_DETAILS_URL } from "../constants/routes/routes"
 
 import AdminPanelPage from "../pages/admin/AdminPanelPage"
+import AreaPage from "../pages/areas/AreaPage"
 import DashboardLayout from "../pages/layouts/DashboardLayout"
+import DepartmentPage from "../pages/departments/DepartmentPage"
 import HomePage from "../pages/HomePage"
 import LoginPage from "../pages/auth/LoginPage"
 import NavLayout from "../pages/layouts/NavLayout"
@@ -50,9 +52,19 @@ const AppRouter = () => {
                                 <WorkerDetailsPage />
                             </RequireAuth>
                         } />
-                        <Route path={ROUTE_OCCUPATION_URL} element={
+                        <Route path={ROUTE_OCCUPATIONS_URL} element={
                             <RequireAuth unauthenticated={<Navigate to={ROUTE_LOGIN_URL} replace={true} />}>
                                 <OccupationPage />
+                            </RequireAuth>
+                        } />
+                        <Route path={ROUTE_DEPARTMENTS_URL} element={
+                            <RequireAuth unauthenticated={<Navigate to={ROUTE_LOGIN_URL} replace={true} />}>
+                                <DepartmentPage />
+                            </RequireAuth>
+                        } />
+                        <Route path={ROUTE_AREAS_URL} element={
+                            <RequireAuth unauthenticated={<Navigate to={ROUTE_LOGIN_URL} replace={true} />}>
+                                <AreaPage />
                             </RequireAuth>
                         } />
                         <Route path={ROUTE_ADMIN_PANEL_URL} element={

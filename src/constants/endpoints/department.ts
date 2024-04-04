@@ -1,0 +1,1 @@
+export const GET_LIST_DEPARTMENTS = 'http://localhost/ficonapi/public/api/departments'
