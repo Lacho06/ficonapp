@@ -1,6 +1,19 @@
 import FormAuth from './../../components/FormAuth'
+import { ROUTE_HOME_URL } from '../../constants/routes/routes'
+import { useAuth } from 'react-auth-utils'
+import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const LoginPage = () => {
+    const { isAuthenticated } = useAuth()
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        if(isAuthenticated){
+            navigate(ROUTE_HOME_URL)
+        }
+    }, [])
+
     return (
         <section className="grid h-screen grid-cols-12">
             <main className="flex flex-col justify-start col-span-12 sm:justify-center sm:col-span-8 place-items-center">

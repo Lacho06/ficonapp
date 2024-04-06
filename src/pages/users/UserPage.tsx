@@ -246,31 +246,33 @@ const UserPage = () => {
                 </div>
                 <Table theme={customTheme}>
                     <Table.Head>
-                        <Table.HeadCell>ID</Table.HeadCell>
-                        <Table.HeadCell>Nombre</Table.HeadCell>
-                        <Table.HeadCell>Correo electrónico</Table.HeadCell>
-                        <Table.HeadCell>Acciones</Table.HeadCell>
+                        <Table.HeadCell className="text-center">ID</Table.HeadCell>
+                        <Table.HeadCell className="text-center">Nombre</Table.HeadCell>
+                        <Table.HeadCell className="text-center">Correo electrónico</Table.HeadCell>
+                        <Table.HeadCell className="text-center">Acciones</Table.HeadCell>
                     </Table.Head>
                     <Table.Body className="divide-y">
                         {
                             (users.length > 0) ? (users.map((user, i) => { 
                                 return <Table.Row key={i} className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                    <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
                                         {user.id}
                                     </Table.Cell>
-                                    <Table.Cell className="flex items-center gap-4 font-medium">
+                                    <Table.Cell className="text-center font-medium">
                                         {user.name}
                                     </Table.Cell>
-                                    <Table.Cell>
+                                    <Table.Cell className="text-center">
                                         {user.email}
                                     </Table.Cell>
-                                    <Table.Cell className="flex gap-4">
-                                        <button type="button" onClick={() => handleEdit(user)} className="font-medium text-yellow-300 dark:text-yellow-400">
-                                            Editar
-                                        </button>
-                                        <button type="button" onClick={() => handleDelete(user)} className="font-medium text-red-600 dark:text-cyan-500">
-                                            Eliminar
-                                        </button>
+                                    <Table.Cell>
+                                        <div className="flex justify-center gap-4">
+                                            <button type="button" onClick={() => handleEdit(user)} className="font-medium text-yellow-300 dark:text-yellow-400">
+                                                Editar
+                                            </button>
+                                            <button type="button" onClick={() => handleDelete(user)} className="font-medium text-red-600 dark:text-cyan-500">
+                                                Eliminar
+                                            </button>
+                                        </div>
                                     </Table.Cell>
                                 </Table.Row>
                             })) : (
@@ -285,10 +287,11 @@ const UserPage = () => {
 
             {/* Modal agregar */}
             <Modal show={openModalAdd} size="md" onClose={closeModalAdd} popup>
-                <Modal.Header />
+                <Modal.Header className="px-2 mb-5 flex items-center">
+                    <h3 className="ml-5 text-xl font-medium text-gray-900 dark:text-white">Agregar nuevo usuario</h3>
+                </Modal.Header>
                 <Modal.Body>
                     <div className="space-y-6">
-                        <h3 className="text-xl font-medium text-gray-900 dark:text-white">Agregar nuevo usuario</h3>
                         <div>
                             <div className="mb-2 block">
                                 <Label htmlFor="name" value="Nombre" />
@@ -388,10 +391,11 @@ const UserPage = () => {
 
             {/* Modal editar */}
             <Modal show={openModalEdit} size="md" onClose={closeModalEdit} popup>
-                <Modal.Header />
+                <Modal.Header className="px-2 mb-5 flex items-center">
+                    <h3 className="ml-5 text-xl font-medium text-gray-900 dark:text-white">Editar impuesto usuario { userSelected && userSelected.name }</h3>
+                </Modal.Header>
                 <Modal.Body>
                     <div className="space-y-6">
-                        <h3 className="text-xl font-medium text-gray-900 dark:text-white">Editar usuario { userSelected && userSelected.name }</h3>
                         <div>
                             <div className="mb-2 block">
                                 <Label htmlFor="name" value="Nombre" />

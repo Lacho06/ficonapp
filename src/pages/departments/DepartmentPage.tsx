@@ -233,26 +233,26 @@ const DepartmentPage = () => {
                 </div>
                 <Table theme={customTheme}>
                     <Table.Head>
-                        <Table.HeadCell>Código</Table.HeadCell>
-                        <Table.HeadCell>Nombre</Table.HeadCell>
-                        <Table.HeadCell>Área</Table.HeadCell>
-                        <Table.HeadCell>Acciones</Table.HeadCell>
+                        <Table.HeadCell className="text-center">Código</Table.HeadCell>
+                        <Table.HeadCell className="text-center">Nombre</Table.HeadCell>
+                        <Table.HeadCell className="text-center">Área</Table.HeadCell>
+                        <Table.HeadCell className="text-center">Acciones</Table.HeadCell>
                     </Table.Head>
                     <Table.Body className="divide-y">
                         {
                             (departments.length > 0) ? (departments.map((department, i) => { 
                                 return <Table.Row key={i} className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                    <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
                                         {department.code}
                                     </Table.Cell>
-                                    <Table.Cell className="flex items-center gap-2">
+                                    <Table.Cell className="text-center">
                                         {department.name}
                                     </Table.Cell>
-                                    <Table.Cell>
+                                    <Table.Cell className="text-center">
                                         {department.areaName}
                                     </Table.Cell>
                                     <Table.Cell>
-                                        <div className="flex gap-4">
+                                        <div className="flex justify-center gap-4">
                                             <button type="button" onClick={() => handleEdit(department)} className="font-medium text-yellow-300 dark:text-yellow-400">
                                                 Editar
                                             </button>
@@ -264,7 +264,7 @@ const DepartmentPage = () => {
                                 </Table.Row>
                             })) : (
                                 <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                                    <Table.Cell className="text-center bg-gray-50" colSpan={3}>No hay departamentos disponibles</Table.Cell>
+                                    <Table.Cell className="text-center bg-gray-50" colSpan={4}>No hay departamentos disponibles</Table.Cell>
                                 </Table.Row>
                             )
                         }
@@ -274,10 +274,11 @@ const DepartmentPage = () => {
 
             {/* Modal agregar */}
             <Modal show={openModalAdd} size="md" onClose={closeModalAdd} popup>
-                <Modal.Header />
+                <Modal.Header className="px-2 mb-5 flex items-center">
+                    <h3 className="ml-5 text-xl font-medium text-gray-900 dark:text-white">Agregar nuevo departamento</h3>
+                </Modal.Header>
                 <Modal.Body>
                     <div className="space-y-6">
-                        <h3 className="text-xl font-medium text-gray-900 dark:text-white">Agregar nuevo departamento</h3>
                         <div>
                             <div className="mb-2 block">
                                 <Label htmlFor="name" value="Nombre" />
@@ -329,10 +330,11 @@ const DepartmentPage = () => {
 
             {/* Modal editar */}
             <Modal show={openModalEdit} size="md" onClose={closeModalEdit} popup>
-                <Modal.Header />
+                <Modal.Header className="px-2 mb-5 flex items-center">
+                    <h3 className="ml-5 text-xl font-medium text-gray-900 dark:text-white">Editar departamento { departmentSelected && departmentSelected.name }</h3>
+                </Modal.Header>
                 <Modal.Body>
                     <div className="space-y-6">
-                        <h3 className="text-xl font-medium text-gray-900 dark:text-white">Editar departamento { departmentSelected && departmentSelected.name }</h3>
                         <div>
                             <div className="mb-2 block">
                                 <Label htmlFor="code" value="Código" />

@@ -1,0 +1,1 @@
+export const GET_LIST_TAXS = 'http://localhost/ficonapi/public/api/taxs'

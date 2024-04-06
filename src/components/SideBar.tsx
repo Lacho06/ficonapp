@@ -1,5 +1,5 @@
 import { CustomFlowbiteTheme, Sidebar } from "flowbite-react"
-import { ROUTE_ADMIN_PANEL_URL, ROUTE_AREAS_URL, ROUTE_OCCUPATIONS_URL, ROUTE_USERS_URL, ROUTE_WORKERS_URL } from "../constants/routes/routes";
+import { ROUTE_ADMIN_PANEL_URL, ROUTE_AREAS_URL, ROUTE_OCCUPATIONS_URL, ROUTE_TAX_URL, ROUTE_USERS_URL, ROUTE_WORKERS_URL } from "../constants/routes/routes";
 
 import { Link } from 'react-router-dom';
 import { ROUTE_DEPARTMENTS_URL } from './../constants/routes/routes';
@@ -51,7 +51,7 @@ const SideBar = () => {
                     </Link>
                 </Sidebar.ItemGroup>
                 <Sidebar.ItemGroup>
-                    <Link to={ROUTE_ADMIN_PANEL_URL}>
+                    <Link to={ROUTE_TAX_URL}>
                         <Sidebar.Item>
                             Impuestos
                         </Sidebar.Item>

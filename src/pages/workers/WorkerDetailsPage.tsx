@@ -50,7 +50,7 @@ const WorkerDetailsPage = () => {
                     <p className="text-gray-800 dark:text-white text-xl">{worker?.ci}</p>
                 </div>
                 <div className="flex justify-between items-end">
-                    <span className="font-bold text-xl mx-2">Ocupación:</span>
+                    <span className="font-bold text-xl mx-2">Cargo:</span>
                     <p className="text-gray-800 dark:text-white text-xl">{worker?.occupation}</p>
                 </div>
                 <div className="flex justify-between items-end">
