@@ -14,6 +14,10 @@ import {
   ROUTE_WORKERS_URL,
   ROUTE_WORKER_DETAILS_URL,
 } from "../constants/routes/routes";
+import {
+  ROUTE_PAYROLL_DETAILS_URL,
+  ROUTE_PRE_PAYROLL_DETAILS_URL,
+} from "./../constants/routes/routes";
 
 import AreaPage from "../pages/areas/AreaPage";
 import DashboardLayout from "../pages/layouts/DashboardLayout";
@@ -23,7 +27,9 @@ import LoginPage from "../pages/auth/LoginPage";
 import NavLayout from "../pages/layouts/NavLayout";
 import OccupationDetailsPage from "./../pages/occupations/OccupationDetailsPage";
 import OccupationPage from "../pages/occupations/OccupationPage";
+import PayrollDetailsPage from "../pages/payroll/PayrollDetailsPage";
 import PayrollPage from "../pages/payroll/PayrollPage";
+import PrePayrollDetailsPage from "../pages/pre-payroll/PrePayrollDetailsPage";
 import PrePayrollPage from "../pages/pre-payroll/PrePayrollPage";
 import TaxPage from "../pages/tax/TaxPage";
 import UserPage from "../pages/users/UserPage";
@@ -67,6 +73,18 @@ const AppRouter = () => {
               }
             />
             <Route
+              path={ROUTE_PRE_PAYROLL_DETAILS_URL}
+              element={
+                <RequireAuth
+                  unauthenticated={
+                    <Navigate to={ROUTE_LOGIN_URL} replace={true} />
+                  }
+                >
+                  <PrePayrollDetailsPage />
+                </RequireAuth>
+              }
+            />
+            <Route
               path={ROUTE_PAYROLL_URL}
               element={
                 <RequireAuth
@@ -75,6 +93,18 @@ const AppRouter = () => {
                   }
                 >
                   <PayrollPage />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path={ROUTE_PAYROLL_DETAILS_URL}
+              element={
+                <RequireAuth
+                  unauthenticated={
+                    <Navigate to={ROUTE_LOGIN_URL} replace={true} />
+                  }
+                >
+                  <PayrollDetailsPage />
                 </RequireAuth>
               }
             />
