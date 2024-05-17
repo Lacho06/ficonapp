@@ -15,6 +15,12 @@ export type PrePayrollBase = {
   year: PrePayrollYear;
 };
 
+export type PrePayrollBaseWithId = {
+  id: PrePayrollId;
+  month: PrePayrollMonth;
+  year: PrePayrollYear;
+};
+
 export type PrePayroll = {
   id: PrePayrollId;
   month: PrePayrollMonth;
@@ -65,10 +71,3 @@ export type NewPrePayrollWorker = {
   vacationDays: number;
   workerId: number;
 };
-
-// export type OccupationDetails = {
-//   id: OccupationId;
-//   name: OccupationName;
-//   salary: OccupationSalary;
-//   workers: Worker[];
-// };

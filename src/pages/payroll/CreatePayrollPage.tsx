@@ -6,25 +6,41 @@ import {
   Select,
   Table,
 } from "flowbite-react";
+import {
+  GET_LIST_PRE_PAYROLLS,
+  GET_PRE_PAYROLL_WORKERS_BY_ID,
+} from "../../constants/endpoints/prepayroll";
 import { Link, useNavigate } from "react-router-dom";
+import { PayrollWithoutId, PayrollWorker } from "../../constants/types/payroll";
+import {
+  PrePayrollBaseWithId,
+  PrePayrollWorkerTable,
+} from "../../constants/types/prepayroll";
 import {
   ROUTE_HOME_URL,
   ROUTE_PAYROLL_URL,
 } from "../../constants/routes/routes";
 import { useEffect, useState } from "react";
 
-import { GET_LIST_PRE_PAYROLLS } from "../../constants/endpoints/prepayroll";
+import { ERROR_MESSAGES } from "../../constants/app";
 import { HiHome } from "react-icons/hi";
-import { Payroll } from "../../constants/types/payroll";
-import { PrePayroll } from "../../constants/types/prepayroll";
 import axios from "axios";
+import { toDecimal } from "../../services/app";
+
+type ErrorPrePayroll = {
+  prePayrollId: string;
+};
 
 const CreatePayrollPage = () => {
   const navigate = useNavigate();
-  const [prePayrollSelected, setPrePayrollSelected] = useState<PrePayroll>();
-  const [prePayrolls, setPrePayrolls] = useState<PrePayroll[]>();
-  const [payroll, setPayroll] = useState<Payroll>();
+  const [prePayrollSelected, setPrePayrollSelected] =
+    useState<PrePayrollBaseWithId>();
+  const [prePayrolls, setPrePayrolls] = useState<PrePayrollBaseWithId[]>();
+  const [payroll, setPayroll] = useState<PayrollWithoutId>();
   const [showTable, setShowTable] = useState(false);
+  const [errorPrePayroll, setErrorPrePayroll] = useState<ErrorPrePayroll>({
+    prePayrollId: "",
+  });
 
   useEffect(() => {
     axios.get(GET_LIST_PRE_PAYROLLS).then(({ data }) => {
@@ -32,10 +48,35 @@ const CreatePayrollPage = () => {
     });
   }, []);
 
+  useEffect(() => {
+    if (prePayrollSelected && showTable) {
+      axios
+        .get(`${GET_PRE_PAYROLL_WORKERS_BY_ID}/${prePayrollSelected.id}`)
+        .then(({ data }) => {
+          // hacer los calculos de la nomina
+          calcPayroll(data.workers);
+        });
+    }
+  }, [prePayrollSelected, showTable]);
+
   const [openModalEdit, setOpenModalEdit] = useState(false);
 
   const closeModalEdit = () => {
     setOpenModalEdit(false);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (!prePayrolls) return;
+
+    const prePayroll = prePayrolls.find(
+      (prePayroll) => prePayroll.id === Number.parseInt(e.target.value)
+    );
+
+    setPrePayrollSelected(prePayroll);
+  };
+
+  const handleEdit = (payrollWorker: PayrollWorker) => {
+    console.log(payrollWorker.worker.name);
   };
 
   const savePayroll = () => {
@@ -43,9 +84,92 @@ const CreatePayrollPage = () => {
     navigate(ROUTE_PAYROLL_URL);
   };
 
+  const calcPayroll = (prePayrollWorkers: PrePayrollWorkerTable[]) => {
+    if (!prePayrollSelected) return;
+
+    const payrollWorkers: PayrollWorker[] = [];
+
+    // iteramos los trabajadores de la prenomina, por cada uno se haran los calculos y se agregaran a la nomina
+    prePayrollWorkers.map((prePayrollWorker) => {
+      // calculos de cada trabajador
+
+      // tarifa salarial
+      const salaryRate = toDecimal(prePayrollWorker.occupation.salary);
+      // horas trabajadas
+      const hours = toDecimal(prePayrollWorker.hTrab);
+      // a cobrar = tarifa salarial * horas trabajadas
+      const toCollect = toDecimal(salaryRate * hours);
+      // bonificaciones
+      const bonus = 0;
+      // pat
+      const pat = 0;
+      // salario devengado
+      const earnedSalary = toDecimal(toCollect + bonus + pat);
+
+      const vacaciones = toDecimal((earnedSalary * 9.09) / 100);
+      const fondoSalario = toDecimal(earnedSalary + vacaciones + bonus);
+
+      const fuerzaTrabajo = toDecimal((fondoSalario * 5) / 100);
+      const segSocial = toDecimal((fondoSalario * 12.5) / 100);
+      const provicion = toDecimal((fondoSalario * 1.5) / 100);
+      const totalGasto = toDecimal(fuerzaTrabajo + segSocial + provicion);
+
+      const ret = 0;
+
+      const paid = toDecimal(earnedSalary - totalGasto - ret);
+
+      payrollWorkers.push({
+        salaryRate: salaryRate,
+        hours: hours,
+        toCollect: toCollect,
+        bonus: bonus,
+        pat: pat,
+        earnedSalary: earnedSalary,
+        salaryTax: totalGasto,
+        withHoldings: ret,
+        paid: paid,
+        worker: prePayrollWorker.worker,
+      });
+
+      // se agregan a los trabajadores de la nomina
+    });
+
+    setPayroll({
+      month: prePayrollSelected.month,
+      year: prePayrollSelected.year,
+      prePayrollId: prePayrollSelected.id,
+      workers: payrollWorkers,
+    });
+  };
+
   const checkPrePayroll = () => {
+    if (!prePayrollSelected || !prePayrolls) return;
     // validar los datos
-    let newError = {};
+    let newError = {
+      prePayrollId: "",
+    };
+
+    if (prePayrollSelected.id.toString() === "") {
+      newError = {
+        ...newError,
+        prePayrollId: ERROR_MESSAGES.EMPTY_FIELD,
+      };
+      setErrorPrePayroll(newError);
+    } else if (
+      !prePayrolls.some((prePayroll) => prePayroll.id === prePayrollSelected.id)
+    ) {
+      newError = {
+        ...newError,
+        prePayrollId: ERROR_MESSAGES.INCORRECT_FIELD,
+      };
+      setErrorPrePayroll(newError);
+    } else {
+      setErrorPrePayroll(newError);
+    }
+
+    if (newError.prePayrollId === "") {
+      setShowTable(true);
+    }
   };
 
   const customTheme: CustomFlowbiteTheme["table"] = {
@@ -83,36 +207,32 @@ const CreatePayrollPage = () => {
           <Table theme={customTheme}>
             <Table.Head>
               <Table.HeadCell colSpan={14} className="text-center">
-                Prenómina
+                Nómina{" "}
+                {`${prePayrollSelected?.month.toUpperCase()} de ${
+                  prePayrollSelected?.year
+                }`}
               </Table.HeadCell>
             </Table.Head>
             <Table.Head>
               <Table.HeadCell className="text-center">Código</Table.HeadCell>
               <Table.HeadCell className="text-center">
-                CI - Nombres
+                Nombres y apellidos
               </Table.HeadCell>
-              <Table.HeadCell className="text-center">H. Trab</Table.HeadCell>
-              <Table.HeadCell className="text-center">H.N. Trab</Table.HeadCell>
-              <Table.HeadCell className="text-center">Impunt.</Table.HeadCell>
-              <Table.HeadCell className="text-center">Días Vac.</Table.HeadCell>
+              <Table.HeadCell className="text-center">C.I.</Table.HeadCell>
               <Table.HeadCell className="text-center">
-                Horas Certif.
+                Cat. Ocup.
               </Table.HeadCell>
               <Table.HeadCell className="text-center">
-                Hrs. Lic.Matern.
+                Tarf. Sal.
               </Table.HeadCell>
-              <Table.HeadCell className="text-center">
-                Hrs. Resol.
-              </Table.HeadCell>
-              <Table.HeadCell className="text-center">
-                Hrs. Interr.
-              </Table.HeadCell>
-              <Table.HeadCell className="text-center">
-                Otro Tpo a Pagar
-              </Table.HeadCell>
-              <Table.HeadCell className="text-center">
-                Hrs. Extras
-              </Table.HeadCell>
+              <Table.HeadCell className="text-center">Horas</Table.HeadCell>
+              <Table.HeadCell className="text-center">A cobrar</Table.HeadCell>
+              <Table.HeadCell className="text-center">Bon.</Table.HeadCell>
+              <Table.HeadCell className="text-center">P.A.T.</Table.HeadCell>
+              <Table.HeadCell className="text-center">Deven.</Table.HeadCell>
+              <Table.HeadCell className="text-center">Imp. S.</Table.HeadCell>
+              <Table.HeadCell className="text-center">Ret.</Table.HeadCell>
+              <Table.HeadCell className="text-center">Pagado</Table.HeadCell>
               <Table.HeadCell className="text-center">Acciones</Table.HeadCell>
             </Table.Head>
             <Table.Body className="divide-y">
@@ -163,15 +283,15 @@ const CreatePayrollPage = () => {
                         {payrollWorker.paid}
                       </Table.Cell>
                       <Table.Cell>
-                        {/* <div className="flex justify-center gap-4">
-                            <button
-                              type="button"
-                              onClick={() => handleEdit(payrollWorker)}
-                              className="font-medium text-yellow-300 dark:text-yellow-400"
-                            >
-                              Editar
-                            </button>
-                          </div> */}
+                        <div className="flex justify-center gap-4">
+                          <button
+                            type="button"
+                            onClick={() => handleEdit(payrollWorker)}
+                            className="font-medium text-yellow-300 dark:text-yellow-400"
+                          >
+                            Editar
+                          </button>
+                        </div>
                       </Table.Cell>
                     </Table.Row>
                   );
@@ -196,18 +316,14 @@ const CreatePayrollPage = () => {
               id="prePayrollId"
               name="prePayrollId"
               value={prePayrollSelected && prePayrollSelected.id}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                prePayrollSelected &&
-                setPrePayrollSelected({
-                  ...prePayrollSelected,
-                  month: e.target.value,
-                })
-              }
-              color={errorPrePayroll.month !== "" ? "failure" : "gray"}
+              onChange={handleChange}
+              color={errorPrePayroll.prePayrollId !== "" ? "failure" : "gray"}
               helperText={
-                errorPrePayroll.month !== "" && (
+                errorPrePayroll.prePayrollId !== "" && (
                   <>
-                    <span className="font-medium">{errorPrePayroll.month}</span>
+                    <span className="font-medium">
+                      {errorPrePayroll.prePayrollId}
+                    </span>
                   </>
                 )
               }
@@ -227,7 +343,7 @@ const CreatePayrollPage = () => {
             </Select>
           </div>
           <Button
-            type="submit"
+            type="button"
             color="success"
             className="mt-auto"
             disabled={prePayrolls && prePayrolls.length === 0}

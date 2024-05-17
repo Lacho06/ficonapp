@@ -9,6 +9,13 @@ export type PayrollId = number;
 export type PayrollMonth = string;
 export type PayrollYear = number;
 
+export type PayrollWithoutId = {
+  month: PayrollMonth;
+  year: PayrollYear;
+  prePayrollId: number;
+  workers: PayrollWorker[];
+};
+
 export type Payroll = {
   id: PayrollId;
   month: PayrollMonth;

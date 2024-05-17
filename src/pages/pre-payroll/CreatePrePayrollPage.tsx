@@ -750,8 +750,8 @@ const CreatePrePayrollPage = () => {
               <Table.HeadCell className="text-center">
                 CI - Nombres
               </Table.HeadCell>
-              <Table.HeadCell className="text-center">H. Trab</Table.HeadCell>
-              <Table.HeadCell className="text-center">H.N. Trab</Table.HeadCell>
+              <Table.HeadCell className="text-center">H.Trab</Table.HeadCell>
+              <Table.HeadCell className="text-center">H.N.Trab</Table.HeadCell>
               <Table.HeadCell className="text-center">Impunt.</Table.HeadCell>
               <Table.HeadCell className="text-center">Días Vac.</Table.HeadCell>
               <Table.HeadCell className="text-center">
@@ -901,7 +901,7 @@ const CreatePrePayrollPage = () => {
             />
           </div>
           <Button
-            type="submit"
+            type="button"
             color="success"
             className="mt-auto"
             disabled={prePayrollWorkers.length === 0}
