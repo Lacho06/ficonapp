@@ -30,12 +30,12 @@ export const ROUTE_TAX_URL = "/taxes";
 
 // prepayrolls routes
 export const ROUTE_PRE_PAYROLL_URL = "/pre-payrolls";
+export const ROUTE_CREATE_PRE_PAYROLL_URL = "/pre-payroll/create";
 export const ROUTE_PRE_PAYROLL_DETAILS_PREFIX = "/pre-payroll";
 export const ROUTE_PRE_PAYROLL_DETAILS_URL = `${ROUTE_PRE_PAYROLL_DETAILS_PREFIX}/:id`;
-export const ROUTE_CREATE_PRE_PAYROLL_URL = "/pre-payroll/create";
 
 // payrolls routes
 export const ROUTE_PAYROLL_URL = "/payrolls";
+export const ROUTE_CREATE_PAYROLL_URL = "/payroll/create";
 export const ROUTE_PAYROLL_DETAILS_PREFIX = "/payroll";
 export const ROUTE_PAYROLL_DETAILS_URL = `${ROUTE_PAYROLL_DETAILS_PREFIX}/:id`;
-export const ROUTE_CREATE_PAYROLL_URL = "/payroll/create";

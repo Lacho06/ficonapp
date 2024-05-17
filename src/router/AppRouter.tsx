@@ -2,6 +2,8 @@ import { AuthProvider, RequireAuth } from "react-auth-utils";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import {
   ROUTE_AREAS_URL,
+  ROUTE_CREATE_PAYROLL_URL,
+  ROUTE_CREATE_PRE_PAYROLL_URL,
   ROUTE_DEPARTMENTS_URL,
   ROUTE_HOME_URL,
   ROUTE_LOGIN_URL,
@@ -20,6 +22,8 @@ import {
 } from "./../constants/routes/routes";
 
 import AreaPage from "../pages/areas/AreaPage";
+import CreatePayrollPage from "../pages/payroll/CreatePayrollPage";
+import CreatePrePayrollPage from "../pages/pre-payroll/CreatePrePayrollPage";
 import DashboardLayout from "../pages/layouts/DashboardLayout";
 import DepartmentPage from "../pages/departments/DepartmentPage";
 import HomePage from "../pages/HomePage";
@@ -73,6 +77,18 @@ const AppRouter = () => {
               }
             />
             <Route
+              path={ROUTE_CREATE_PRE_PAYROLL_URL}
+              element={
+                <RequireAuth
+                  unauthenticated={
+                    <Navigate to={ROUTE_LOGIN_URL} replace={true} />
+                  }
+                >
+                  <CreatePrePayrollPage />
+                </RequireAuth>
+              }
+            />
+            <Route
               path={ROUTE_PRE_PAYROLL_DETAILS_URL}
               element={
                 <RequireAuth
@@ -93,6 +109,18 @@ const AppRouter = () => {
                   }
                 >
                   <PayrollPage />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path={ROUTE_CREATE_PAYROLL_URL}
+              element={
+                <RequireAuth
+                  unauthenticated={
+                    <Navigate to={ROUTE_LOGIN_URL} replace={true} />
+                  }
+                >
+                  <CreatePayrollPage />
                 </RequireAuth>
               }
             />

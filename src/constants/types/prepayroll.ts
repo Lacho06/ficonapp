@@ -10,6 +10,11 @@ export type PrePayrollId = number;
 export type PrePayrollMonth = string;
 export type PrePayrollYear = number;
 
+export type PrePayrollBase = {
+  month: PrePayrollMonth;
+  year: PrePayrollYear;
+};
+
 export type PrePayroll = {
   id: PrePayrollId;
   month: PrePayrollMonth;
@@ -18,7 +23,6 @@ export type PrePayroll = {
 };
 
 export type PrePayrollWorker = {
-  id: number;
   code: WorkerCode;
   ci: WorkerCI;
   name: WorkerName;
