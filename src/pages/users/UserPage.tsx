@@ -459,6 +459,8 @@ const UserPage = () => {
                 <option value="user" defaultChecked>
                   User
                 </option>
+                <option value="economia">Economía</option>
+                <option value="rec. humanos">Rec. Humanos</option>
                 <option value="admin">Admin</option>
               </Select>
             </div>
@@ -619,18 +621,10 @@ const UserPage = () => {
                   })
                 }
               >
-                <option
-                  value="user"
-                  defaultChecked={userSelected && userSelected.role === "user"}
-                >
-                  User
-                </option>
-                <option
-                  value="admin"
-                  defaultChecked={userSelected && userSelected.role === "admin"}
-                >
-                  Admin
-                </option>
+                <option value="user">User</option>
+                <option value="economia">Economía</option>
+                <option value="rec. humanos">Rec. Humanos</option>
+                <option value="admin">Admin</option>
               </Select>
             </div>
             <div>

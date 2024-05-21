@@ -1,4 +1,5 @@
 import { Breadcrumb, Button, CustomFlowbiteTheme, Table } from "flowbite-react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   ROUTE_CREATE_PAYROLL_URL,
   ROUTE_HOME_URL,
@@ -9,11 +10,20 @@ import { useEffect, useState } from "react";
 
 import { GET_LIST_PAYROLLS } from "../../constants/endpoints/payrolls";
 import { HiHome } from "react-icons/hi";
-import { Link } from "react-router-dom";
 import { Payroll } from "../../constants/types/payroll";
 import axios from "axios";
+import { useLogin } from "../../hooks/useLogin";
 
 const PayrollPage = () => {
+  const { user } = useLogin();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user || user.role !== "economia") {
+      navigate(ROUTE_HOME_URL);
+    }
+  }, []);
+
   const [payrolls, setPayrolls] = useState<Payroll[]>([]);
 
   useEffect(() => {

@@ -1,6 +1,8 @@
 import { ROUTE_HOME_URL, ROUTE_LOGIN_URL } from "../constants/routes/routes";
 import { User, UserFormLogin } from "../constants/types/user";
 
+import { POST_USER_LOGIN } from "../constants/endpoints/user";
+import axios from "axios";
 import { useAuth } from "react-auth-utils";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -10,17 +12,19 @@ export function useLogin(initialPath?: string) {
   const navigate = useNavigate();
 
   const login = (newUser: UserFormLogin, action: () => void) => {
-    // todo se llama a la api y esta devuelve un JWT
-    const JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.";
-    signIn(JWT, undefined, {
-      id: 1,
-      name: "Ejemplo",
-      email: newUser.email,
-      password: newUser.password,
-      role: "user",
-      image: "",
+    // se llama a la api y esta devuelve un JWT
+    axios.post(POST_USER_LOGIN, newUser).then(({ data }) => {
+      const JWT = data.jwt;
+      signIn(JWT, undefined, {
+        id: data.user.id,
+        name: data.user.name,
+        email: data.user.email,
+        password: data.user.password,
+        role: data.user.role,
+        image: data.user.image,
+      });
+      action();
     });
-    action();
   };
 
   useEffect(() => {

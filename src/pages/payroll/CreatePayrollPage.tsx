@@ -3,8 +3,10 @@ import {
   Button,
   CustomFlowbiteTheme,
   Label,
+  Modal,
   Select,
   Table,
+  TextInput,
 } from "flowbite-react";
 import {
   GET_LIST_PRE_PAYROLLS,
@@ -31,15 +33,28 @@ type ErrorPrePayroll = {
   prePayrollId: string;
 };
 
+type ErrorPayrollEdit = {
+  bonus: string;
+  pat: string;
+  withHoldings: string;
+};
+
 const CreatePayrollPage = () => {
   const navigate = useNavigate();
   const [prePayrollSelected, setPrePayrollSelected] =
     useState<PrePayrollBaseWithId>();
   const [prePayrolls, setPrePayrolls] = useState<PrePayrollBaseWithId[]>();
   const [payroll, setPayroll] = useState<PayrollWithoutId>();
+  const [payrollWorkerSelected, setPayrollWorkerSelected] =
+    useState<PayrollWorker>();
   const [showTable, setShowTable] = useState(false);
   const [errorPrePayroll, setErrorPrePayroll] = useState<ErrorPrePayroll>({
     prePayrollId: "",
+  });
+  const [errorPayroll, setErrorPayroll] = useState<ErrorPayrollEdit>({
+    bonus: "",
+    pat: "",
+    withHoldings: "",
   });
 
   useEffect(() => {
@@ -76,7 +91,8 @@ const CreatePayrollPage = () => {
   };
 
   const handleEdit = (payrollWorker: PayrollWorker) => {
-    console.log(payrollWorker.worker.name);
+    setPayrollWorkerSelected(payrollWorker);
+    setOpenModalEdit(true);
   };
 
   const savePayroll = () => {
@@ -169,6 +185,82 @@ const CreatePayrollPage = () => {
 
     if (newError.prePayrollId === "") {
       setShowTable(true);
+    }
+  };
+
+  const editPayrollWorker = () => {
+    if (!payrollWorkerSelected || !payroll) return;
+    // validar los datos
+    let newError = {
+      bonus: "",
+      pat: "",
+      withHoldings: "",
+    };
+
+    if (payrollWorkerSelected.bonus < 0) {
+      newError = {
+        ...newError,
+        bonus: ERROR_MESSAGES.INCORRECT_FIELD,
+      };
+      setErrorPayroll(newError);
+    } else {
+      newError = {
+        ...newError,
+        bonus: "",
+      };
+      setErrorPayroll(newError);
+    }
+
+    if (payrollWorkerSelected.pat < 0) {
+      newError = {
+        ...newError,
+        pat: ERROR_MESSAGES.INCORRECT_FIELD,
+      };
+      setErrorPayroll(newError);
+    } else {
+      newError = {
+        ...newError,
+        pat: "",
+      };
+      setErrorPayroll(newError);
+    }
+
+    if (payrollWorkerSelected.withHoldings < 0) {
+      newError = {
+        ...newError,
+        withHoldings: ERROR_MESSAGES.INCORRECT_FIELD,
+      };
+      setErrorPayroll(newError);
+    } else {
+      newError = {
+        ...newError,
+        withHoldings: "",
+      };
+      setErrorPayroll(newError);
+    }
+
+    if (
+      newError.bonus === "" &&
+      newError.pat === "" &&
+      newError.withHoldings === ""
+    ) {
+      // todo llamada a la api para obtener un id disponible
+      const payrollWorkerFiltereds = payroll.workers.filter(
+        (payrollWorker) =>
+          payrollWorker.worker.name !== payrollWorkerSelected.worker.name
+      );
+
+      setPayroll({
+        ...payroll,
+        workers: [...payrollWorkerFiltereds, payrollWorkerSelected].sort(
+          (a: PayrollWorker, b: PayrollWorker) => {
+            return a.worker.name - b.worker.name;
+          }
+        ),
+      });
+      setPayrollWorkerSelected(undefined);
+
+      closeModalEdit();
     }
   };
 
@@ -353,6 +445,140 @@ const CreatePayrollPage = () => {
           </Button>
         </form>
       )}
+
+      {/* Modal editar */}
+      <Modal show={openModalEdit} size="md" onClose={closeModalEdit} popup>
+        <Modal.Header className="px-2 mb-5 flex items-center">
+          <h3 className="ml-5 text-xl font-medium text-gray-900 dark:text-white">
+            Editar fila
+          </h3>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="space-y-6">
+            <div className="w-full">
+              <div className="mb-2">
+                <Label htmlFor="bonus" value="Bonus" />
+                <span className="text-red-800 mx-1 font-bold">*</span>
+              </div>
+              <TextInput
+                id="bonus"
+                type="number"
+                name="bonus"
+                placeholder="0"
+                value={payrollWorkerSelected && payrollWorkerSelected.bonus}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  payrollWorkerSelected &&
+                  setPayrollWorkerSelected({
+                    ...payrollWorkerSelected,
+                    [e.target.name]: e.target.value,
+                  })
+                }
+                color={
+                  payrollWorkerSelected &&
+                  payrollWorkerSelected.bonus < 0 &&
+                  errorPayroll.bonus === ""
+                    ? "warning"
+                    : errorPayroll.bonus !== ""
+                    ? "failure"
+                    : "gray"
+                }
+                helperText={
+                  errorPayroll.bonus !== "" && (
+                    <>
+                      <span className="font-medium">{errorPayroll.bonus}</span>
+                    </>
+                  )
+                }
+              />
+            </div>
+            <div className="w-full">
+              <div className="mb-2">
+                <Label htmlFor="pat" value="P.A.T." />
+                <span className="text-red-800 mx-1 font-bold">*</span>
+              </div>
+              <TextInput
+                id="pat"
+                type="number"
+                name="pat"
+                placeholder="0"
+                value={payrollWorkerSelected && payrollWorkerSelected.pat}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  payrollWorkerSelected &&
+                  setPayrollWorkerSelected({
+                    ...payrollWorkerSelected,
+                    [e.target.name]: e.target.value,
+                  })
+                }
+                color={
+                  payrollWorkerSelected &&
+                  payrollWorkerSelected.pat < 0 &&
+                  errorPayroll.pat === ""
+                    ? "warning"
+                    : errorPayroll.pat !== ""
+                    ? "failure"
+                    : "gray"
+                }
+                helperText={
+                  errorPayroll.pat !== "" && (
+                    <>
+                      <span className="font-medium">{errorPayroll.pat}</span>
+                    </>
+                  )
+                }
+              />
+            </div>
+            <div className="w-full">
+              <div className="mb-2">
+                <Label htmlFor="withHoldings" value="Ret." />
+                <span className="text-red-800 mx-1 font-bold">*</span>
+              </div>
+              <TextInput
+                id="withHoldings"
+                type="number"
+                name="withHoldings"
+                placeholder="0"
+                value={
+                  payrollWorkerSelected && payrollWorkerSelected.withHoldings
+                }
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  payrollWorkerSelected &&
+                  setPayrollWorkerSelected({
+                    ...payrollWorkerSelected,
+                    [e.target.name]: e.target.value,
+                  })
+                }
+                color={
+                  payrollWorkerSelected &&
+                  payrollWorkerSelected.withHoldings < 0 &&
+                  errorPayroll.withHoldings === ""
+                    ? "warning"
+                    : errorPayroll.withHoldings !== ""
+                    ? "failure"
+                    : "gray"
+                }
+                helperText={
+                  errorPayroll.withHoldings !== "" && (
+                    <>
+                      <span className="font-medium">
+                        {errorPayroll.withHoldings}
+                      </span>
+                    </>
+                  )
+                }
+              />
+            </div>
+            <div className="w-full">
+              <Button
+                className="px-4"
+                color="warning"
+                onClick={editPayrollWorker}
+              >
+                Editar
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
     </>
   );
 };

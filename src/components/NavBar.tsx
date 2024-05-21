@@ -1,7 +1,8 @@
 import { Avatar, Dropdown, Navbar } from "flowbite-react";
+import { ROUTE_HOME_URL, ROUTE_USERS_URL } from "../constants/routes/routes";
 
 import { APP_NAME } from "../constants/app";
-import { ROUTE_HOME_URL } from "../constants/routes/routes";
+import { Link } from "react-router-dom";
 import { useLogin } from "../hooks/useLogin";
 
 const NavBar = () => {
@@ -17,6 +18,9 @@ const NavBar = () => {
           {APP_NAME}
         </span>
       </Navbar.Brand>
+      {user && user.role === "admin" && (
+        <Link to={ROUTE_USERS_URL}>Panel administrativo</Link>
+      )}
       <div className="flex md:order-2">
         {user && (
           <Dropdown

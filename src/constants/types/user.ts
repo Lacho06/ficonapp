@@ -4,7 +4,7 @@ export type UserId = number;
 export type UserEmail = `${string}@${string}.${string}` | string;
 export type UserName = string;
 export type UserPassword = string;
-export type UserRole = "user" | "admin";
+export type UserRole = "user" | "admin" | "economia" | "rec. humanos";
 export type UserImage = string;
 
 export type UserFormLogin = {

@@ -38,7 +38,17 @@ const SideBar = () => {
               <Sidebar.Item>Usuarios</Sidebar.Item>
             </Link>
           )}
-          {isAuthenticated && user?.role === "user" && (
+          {isAuthenticated && user?.role === "economia" && (
+            <>
+              <Link to={ROUTE_TAX_URL}>
+                <Sidebar.Item>Impuestos</Sidebar.Item>
+              </Link>
+              <Link to={ROUTE_PAYROLL_URL}>
+                <Sidebar.Item>Nómina</Sidebar.Item>
+              </Link>
+            </>
+          )}
+          {isAuthenticated && user?.role === "rec. humanos" && (
             <>
               <Link to={ROUTE_WORKERS_URL}>
                 <Sidebar.Item>Plantilla</Sidebar.Item>
@@ -52,14 +62,8 @@ const SideBar = () => {
               <Link to={ROUTE_AREAS_URL}>
                 <Sidebar.Item>Areas</Sidebar.Item>
               </Link>
-              <Link to={ROUTE_TAX_URL}>
-                <Sidebar.Item>Impuestos</Sidebar.Item>
-              </Link>
               <Link to={ROUTE_PRE_PAYROLL_URL}>
                 <Sidebar.Item>Prenómina</Sidebar.Item>
-              </Link>
-              <Link to={ROUTE_PAYROLL_URL}>
-                <Sidebar.Item>Nómina</Sidebar.Item>
               </Link>
             </>
           )}

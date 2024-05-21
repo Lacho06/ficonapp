@@ -16,7 +16,9 @@ import {
 } from "../../constants/routes/routes";
 import { useEffect, useState } from "react";
 
+import { Department } from "../../constants/types/department";
 import { ERROR_MESSAGES } from "../../constants/app";
+import { GET_LIST_DEPARTMENTS } from "../../constants/endpoints/department";
 import { GET_LIST_WORKERS } from "../../constants/endpoints/worker";
 import { HiHome } from "react-icons/hi";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
@@ -27,27 +29,32 @@ const initialNewWorker: NewWorker = {
   name: "",
   ci: 0,
   category: "ingeniero",
+  department: "",
 };
 
 type ErrorWorkerFields = {
   name: string;
   ci: string;
   category: string;
+  department: string;
 };
 
 const WorkerPage = () => {
   const [workers, setWorkers] = useState<Worker[]>([]);
   const [workerSelected, setWorkerSelected] = useState<Worker>();
   const [newWorker, setNewWorker] = useState<NewWorker>(initialNewWorker);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [error, setError] = useState<ErrorWorkerFields>({
     name: "",
     ci: "",
     category: "",
+    department: "",
   });
 
   useEffect(() => {
     // llamada a la api
     axios.get(GET_LIST_WORKERS).then(({ data }) => setWorkers(data));
+    axios.get(GET_LIST_DEPARTMENTS).then(({ data }) => setDepartments(data));
   }, []);
 
   const [openModalAdd, setOpenModalAdd] = useState(false);
@@ -82,6 +89,7 @@ const WorkerPage = () => {
       name: "",
       ci: "",
       category: "",
+      department: "",
     };
 
     if (newWorker.name.trim() === "") {
@@ -145,10 +153,35 @@ const WorkerPage = () => {
       setError(newError);
     }
 
+    if (newWorker.department.trim() === "") {
+      newError = {
+        ...newError,
+        department: ERROR_MESSAGES.EMPTY_FIELD,
+      };
+      setError(newError);
+    } else if (
+      departments.every(
+        (department) => department.name !== newWorker.department
+      )
+    ) {
+      newError = {
+        ...newError,
+        department: ERROR_MESSAGES.INCORRECT_FIELD,
+      };
+      setError(newError);
+    } else {
+      newError = {
+        ...newError,
+        department: "",
+      };
+      setError(newError);
+    }
+
     if (
       newError.name === "" &&
       newError.ci === "" &&
-      newError.category === ""
+      newError.category === "" &&
+      newError.department === ""
     ) {
       // todo llamada a la api para obtener un id disponible
       const newCode = 100;
@@ -458,6 +491,35 @@ const WorkerPage = () => {
                 <option value="doctor">Doctor</option>
               </Select>
             </div>
+            <div>
+              <div className="mb-2 block">
+                <Label htmlFor="department" value="Departamento" />
+                <span className="text-red-800 mx-1 font-bold">*</span>
+              </div>
+              <Select
+                id="department"
+                name="department"
+                value={newWorker.department}
+                required
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                  setNewWorker({
+                    ...newWorker,
+                    [e.target.name]: e.target.value,
+                  })
+                }
+              >
+                <option value="" disabled>
+                  Seleccione un departamento
+                </option>
+                {departments.map((department, i) => {
+                  return (
+                    <option key={i} value={department.name}>
+                      {department.name}
+                    </option>
+                  );
+                })}
+              </Select>
+            </div>
             <div className="w-full">
               <Button
                 className="px-4"
@@ -597,6 +659,41 @@ const WorkerPage = () => {
                 >
                   Doctor
                 </option>
+              </Select>
+            </div>
+            <div>
+              <div className="mb-2 block">
+                <Label htmlFor="department" value="Departamento" />
+                <span className="text-red-800 mx-1 font-bold">*</span>
+              </div>
+              <Select
+                id="department"
+                name="department"
+                value={workerSelected && workerSelected.department}
+                required
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                  workerSelected &&
+                  setWorkerSelected({
+                    ...workerSelected,
+                    [e.target.name]: e.target.value,
+                  })
+                }
+              >
+                <option value="">Seleccione un departamento</option>
+                {departments.map((department, i) => {
+                  return (
+                    <option
+                      value={department.name}
+                      key={i}
+                      defaultChecked={
+                        workerSelected &&
+                        department.name === workerSelected.department
+                      }
+                    >
+                      {department.name}
+                    </option>
+                  );
+                })}
               </Select>
             </div>
             <div className="w-full">
