@@ -28,6 +28,7 @@ import { ERROR_MESSAGES } from "../../constants/app";
 import { HiHome } from "react-icons/hi";
 import axios from "axios";
 import { toDecimal } from "../../services/app";
+import { useMiddleware } from "../../hooks/useMiddleware";
 
 type ErrorPrePayroll = {
   prePayrollId: string;
@@ -56,6 +57,8 @@ const CreatePayrollPage = () => {
     pat: "",
     withHoldings: "",
   });
+
+  useMiddleware("economia");
 
   useEffect(() => {
     axios.get(GET_LIST_PRE_PAYROLLS).then(({ data }) => {

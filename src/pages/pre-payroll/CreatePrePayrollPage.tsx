@@ -24,6 +24,7 @@ import { GET_LIST_WORKERS } from "../../constants/endpoints/worker";
 import { HiHome } from "react-icons/hi";
 import { Worker } from "../../constants/types/worker";
 import axios from "axios";
+import { useMiddleware } from "../../hooks/useMiddleware";
 
 const initialNewPrepayrollWorker: PrePayrollWorker = {
   code: -1,
@@ -97,6 +98,8 @@ const CreatePrePayrollPage = () => {
     month: "",
     year: "",
   });
+
+  useMiddleware("rec. humanos");
 
   useEffect(() => {
     axios.get(GET_LIST_WORKERS).then(({ data }) => setWorkers(data));

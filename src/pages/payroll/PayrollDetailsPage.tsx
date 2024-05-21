@@ -11,10 +11,13 @@ import { GET_PAYROLL_DETAILS } from "../../constants/endpoints/payrolls";
 import { HiHome } from "react-icons/hi";
 import { PayrollTable } from "../../constants/types/payroll";
 import axios from "axios";
+import { useMiddleware } from "../../hooks/useMiddleware";
 
 const PayrollDetailsPage = () => {
   const { id } = useParams();
   const [payrollDetails, setPayrollDetails] = useState<PayrollTable>();
+
+  useMiddleware("economia");
 
   useEffect(() => {
     axios.get(`${GET_PAYROLL_DETAILS}/${id}`).then(({ data }) => {

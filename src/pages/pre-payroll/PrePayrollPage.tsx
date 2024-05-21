@@ -12,9 +12,12 @@ import { HiHome } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import { PrePayroll } from "../../constants/types/prepayroll";
 import axios from "axios";
+import { useMiddleware } from "../../hooks/useMiddleware";
 
 const PrePayrollPage = () => {
   const [prePayrolls, setPrePayrolls] = useState<PrePayroll[]>([]);
+
+  useMiddleware("rec. humanos");
 
   useEffect(() => {
     // llamada a la api

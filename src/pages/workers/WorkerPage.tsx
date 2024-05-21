@@ -24,6 +24,7 @@ import { HiHome } from "react-icons/hi";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { useMiddleware } from "../../hooks/useMiddleware";
 
 const initialNewWorker: NewWorker = {
   name: "",
@@ -50,6 +51,8 @@ const WorkerPage = () => {
     category: "",
     department: "",
   });
+
+  useMiddleware("rec. humanos");
 
   useEffect(() => {
     // llamada a la api

@@ -19,6 +19,7 @@ import { HiHome } from "react-icons/hi";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { useMiddleware } from "../../hooks/useMiddleware";
 
 const initialNewUser: NewUser = {
   name: "",
@@ -42,6 +43,8 @@ const UserPage = () => {
     email: "",
     password: "",
   });
+
+  useMiddleware("admin");
 
   useEffect(() => {
     // llamada a la api

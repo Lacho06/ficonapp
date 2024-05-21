@@ -1,26 +1,40 @@
 import { Breadcrumb, CustomFlowbiteTheme, Table } from "flowbite-react";
+import { Fragment, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import {
+  PrePayrollTable,
+  PrePayrollWorkerTable,
+} from "../../constants/types/prepayroll";
 import {
   ROUTE_HOME_URL,
   ROUTE_PRE_PAYROLL_DETAILS_PREFIX,
   ROUTE_PRE_PAYROLL_URL,
 } from "../../constants/routes/routes";
-import { useEffect, useState } from "react";
 
 import { GET_PRE_PAYROLL_WORKERS_BY_ID } from "../../constants/endpoints/prepayroll";
 import { HiHome } from "react-icons/hi";
-import { PrePayrollTable } from "../../constants/types/prepayroll";
 import axios from "axios";
+import { getLimitDay } from "../../services/app";
+import { getNumberMonth } from "./../../services/app";
+import { useMiddleware } from "../../hooks/useMiddleware";
 
 const PrePayrollDetailsPage = () => {
   const { id } = useParams();
   const [prePayrollDetails, setPrePayrollDetails] = useState<PrePayrollTable>();
+
+  useMiddleware("rec. humanos");
 
   useEffect(() => {
     axios.get(`${GET_PRE_PAYROLL_WORKERS_BY_ID}/${id}`).then(({ data }) => {
       setPrePayrollDetails(data);
     });
   }, []);
+
+  useEffect(() => {
+    if (prePayrollDetails) {
+      sortPrePayrollWorkers(prePayrollDetails.workers);
+    }
+  }, [prePayrollDetails]);
 
   const customTheme: CustomFlowbiteTheme["table"] = {
     root: {
@@ -35,6 +49,79 @@ const PrePayrollDetailsPage = () => {
         base: "bg-accent-700 px-6 py-3 group-first/head:first:rounded-tl-lg group-first/head:last:rounded-tr-lg dark:bg-gray-700",
       },
     },
+  };
+
+  const sortPrePayrollWorkers = (
+    prePayrollWorkers: PrePayrollWorkerTable[]
+  ) => {
+    prePayrollWorkers.sort(
+      (a: PrePayrollWorkerTable, b: PrePayrollWorkerTable) => {
+        if (a.area.code > b.area.code) {
+          return 1;
+        }
+        if (a.area.code < b.area.code) {
+          return -1;
+        }
+        if (a.area.code === b.area.code) {
+          if (a.department.code > b.department.code) {
+            return 1;
+          }
+          if (a.department.code < b.department.code) {
+            return -1;
+          }
+        }
+
+        return 0;
+      }
+    );
+  };
+
+  const getTotalDepartments = (prePayrollWorker: PrePayrollWorkerTable) => {
+    if (!prePayrollDetails) return [];
+    let totalHTrab = 0;
+    let totalHNoTrab = 0;
+    let totalImpunt = 0;
+    let totalDiasVac = 0;
+    let totalHrsCertif = 0;
+    let totalHrsLicMatern = 0;
+    let totalHrsResol = 0;
+    let totalHrsInterr = 0;
+    let totalOtroTpoPagar = 0;
+    let totalHrsExtras = 0;
+
+    const prePayrollWorkersFiltereds = prePayrollDetails.workers.filter(
+      (worker) =>
+        worker.department.code === prePayrollWorker.department.code &&
+        worker.area.code === prePayrollWorker.area.code
+    );
+    prePayrollWorkersFiltereds.map((worker) => {
+      totalHTrab += worker.hTrab;
+      totalHNoTrab += worker.hNoTrab;
+      totalImpunt += worker.impunt;
+      totalDiasVac += worker.diasVac;
+      totalHrsCertif += worker.hrsCertif;
+      totalHrsLicMatern += worker.hrsLicMatern;
+      totalHrsResol += worker.hrsResol;
+      totalHrsInterr += worker.hrsInterr;
+      totalOtroTpoPagar += worker.otroTpoPagar;
+      totalHrsExtras += worker.hrsExtras;
+    });
+
+    return [
+      totalHTrab,
+      totalHNoTrab,
+      totalImpunt,
+      totalDiasVac,
+      totalHrsCertif,
+      totalHrsLicMatern,
+      totalHrsResol,
+      totalHrsInterr,
+      totalOtroTpoPagar,
+      totalHrsExtras,
+    ];
+  };
+  const getTotalAreas = () => {
+    return [];
   };
 
   return (
@@ -58,84 +145,396 @@ const PrePayrollDetailsPage = () => {
         <div className="overflow-x-auto col-span-12">
           <Table theme={customTheme}>
             <Table.Head>
+              <Table.HeadCell colSpan={8} className="text-center">
+                {`Desde 1/${
+                  prePayrollDetails && getNumberMonth(prePayrollDetails.month)
+                }/${prePayrollDetails?.year} - Hasta ${
+                  prePayrollDetails && getLimitDay(prePayrollDetails.month)
+                }/${
+                  prePayrollDetails && getNumberMonth(prePayrollDetails.month)
+                }/${prePayrollDetails?.year}`}
+              </Table.HeadCell>
+              <Table.HeadCell colSpan={4} className="text-center">
+                SC-4-05
+              </Table.HeadCell>
+            </Table.Head>
+            <Table.Head>
               <Table.HeadCell colSpan={12} className="text-center">
                 Prenómina
               </Table.HeadCell>
             </Table.Head>
-            <Table.Head>
-              <Table.HeadCell className="text-center">Código</Table.HeadCell>
-              <Table.HeadCell className="text-center">
-                CI - Nombres (Categ. Ocup.)
-              </Table.HeadCell>
-              <Table.HeadCell className="text-center">H. Trab</Table.HeadCell>
-              <Table.HeadCell className="text-center">H.N. Trab</Table.HeadCell>
-              <Table.HeadCell className="text-center">Impunt.</Table.HeadCell>
-              <Table.HeadCell className="text-center">Días Vac.</Table.HeadCell>
-              <Table.HeadCell className="text-center">
-                Horas Certif.
-              </Table.HeadCell>
-              <Table.HeadCell className="text-center">
-                Hrs. Lic.Matern.
-              </Table.HeadCell>
-              <Table.HeadCell className="text-center">
-                Hrs. Resol.
-              </Table.HeadCell>
-              <Table.HeadCell className="text-center">
-                Hrs. Interr.
-              </Table.HeadCell>
-              <Table.HeadCell className="text-center">
-                Otro Tpo a Pagar
-              </Table.HeadCell>
-              <Table.HeadCell className="text-center">
-                Hrs. Extras
-              </Table.HeadCell>
-            </Table.Head>
             <Table.Body className="divide-y">
               {prePayrollDetails && prePayrollDetails.workers.length > 0 ? (
-                prePayrollDetails.workers.map((prePayrollWorker, i) => {
-                  return (
-                    <Table.Row
-                      key={i}
-                      className="bg-white dark:border-gray-700 dark:bg-gray-800"
-                    >
-                      <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
-                        {prePayrollWorker.code}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {`${prePayrollWorker.ci} - ${prePayrollWorker.name} (${prePayrollWorker.occupation.name})`}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {prePayrollWorker.hTrab}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {prePayrollWorker.hNoTrab}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {prePayrollWorker.impunt}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {prePayrollWorker.diasVac}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {prePayrollWorker.hrsCertif}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {prePayrollWorker.hrsLicMatern}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {prePayrollWorker.hrsResol}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {prePayrollWorker.hrsInterr}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {prePayrollWorker.otroTpoPagar}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {prePayrollWorker.hrsExtras}
-                      </Table.Cell>
-                    </Table.Row>
-                  );
+                prePayrollDetails.workers.map((prePayrollWorker, i, array) => {
+                  // primera iteracion y primer elemento de diferente area
+                  if (
+                    i === 0 ||
+                    (i !== 0 &&
+                      prePayrollWorker.area.code !== array[i - 1].area.code)
+                  ) {
+                    return (
+                      <Fragment key={i}>
+                        <Table.Row className="bg-accent-700 dark:border-gray-700 dark:bg-gray-800">
+                          <Table.Cell
+                            colSpan={12}
+                            className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white"
+                          >
+                            {`Área: ${prePayrollWorker.area.code} ${prePayrollWorker.area.name}`}
+                          </Table.Cell>
+                        </Table.Row>
+                        <Table.Row className="bg-accent-700 dark:border-gray-700 dark:bg-gray-800">
+                          <Table.Cell
+                            colSpan={12}
+                            className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white"
+                          >
+                            {`Departamento: ${prePayrollWorker.department.code} ${prePayrollWorker.department.name}`}
+                          </Table.Cell>
+                        </Table.Row>
+                        <Table.Row className="bg-accent-700 dark:border-gray-700 dark:bg-gray-800">
+                          <Table.Cell className="text-center">
+                            Código
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            CI - Nombres (Categ. Ocup.)
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            H. Trab
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            H.N. Trab
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            Impunt.
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            Días Vac.
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            Horas Certif.
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            Hrs. Lic.Matern.
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            Hrs. Resol.
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            Hrs. Interr.
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            Otro Tpo a Pagar
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            Hrs. Extras
+                          </Table.Cell>
+                        </Table.Row>
+                        <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                          <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
+                            {prePayrollWorker.code}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {`${prePayrollWorker.ci} - ${prePayrollWorker.name} (${prePayrollWorker.occupation.name})`}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.hTrab}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.hNoTrab}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.impunt}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.diasVac}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.hrsCertif}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.hrsLicMatern}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.hrsResol}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.hrsInterr}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.otroTpoPagar}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.hrsExtras}
+                          </Table.Cell>
+                        </Table.Row>
+                      </Fragment>
+                    );
+                  } else if (
+                    prePayrollWorker.area.code === array[i - 1].area.code &&
+                    prePayrollWorker.department.code !==
+                      array[i - 1].department.code
+                  ) {
+                    // primer elemento de la misma area pero diferente departamento
+                    return (
+                      <Fragment key={i}>
+                        <Table.Row className="bg-accent-700 dark:border-gray-700 dark:bg-gray-800">
+                          <Table.Cell
+                            colSpan={12}
+                            className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white"
+                          >
+                            {`Departamento: ${prePayrollWorker.department.code} ${prePayrollWorker.department.name}`}
+                          </Table.Cell>
+                        </Table.Row>
+                        <Table.Row className="bg-accent-700 dark:border-gray-700 dark:bg-gray-800">
+                          <Table.Cell className="text-center">
+                            Código
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            CI - Nombres (Categ. Ocup.)
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            H. Trab
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            H.N. Trab
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            Impunt.
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            Días Vac.
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            Horas Certif.
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            Hrs. Lic.Matern.
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            Hrs. Resol.
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            Hrs. Interr.
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            Otro Tpo a Pagar
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            Hrs. Extras
+                          </Table.Cell>
+                        </Table.Row>
+                        <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                          <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
+                            {prePayrollWorker.code}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {`${prePayrollWorker.ci} - ${prePayrollWorker.name} (${prePayrollWorker.occupation.name})`}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.hTrab}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.hNoTrab}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.impunt}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.diasVac}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.hrsCertif}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.hrsLicMatern}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.hrsResol}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.hrsInterr}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.otroTpoPagar}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.hrsExtras}
+                          </Table.Cell>
+                        </Table.Row>
+                      </Fragment>
+                    );
+                  } else if (
+                    i !== array.length &&
+                    prePayrollWorker.area.code === array[i + 1].area.code &&
+                    prePayrollWorker.department.code !==
+                      array[i + 1].department.code
+                  ) {
+                    // ultimo elemento de la misma area pero diferente departamento
+                    return (
+                      <Fragment key={i}>
+                        <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                          <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
+                            {prePayrollWorker.code}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {`${prePayrollWorker.ci} - ${prePayrollWorker.name} (${prePayrollWorker.occupation.name})`}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.hTrab}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.hNoTrab}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.impunt}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.diasVac}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.hrsCertif}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.hrsLicMatern}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.hrsResol}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.hrsInterr}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.otroTpoPagar}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {prePayrollWorker.hrsExtras}
+                          </Table.Cell>
+                        </Table.Row>
+                        <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                          <Table.Cell colSpan={2}>
+                            Total por departamento
+                          </Table.Cell>
+                        </Table.Row>
+                      </Fragment>
+                    );
+                  } else if (
+                    i === array.length ||
+                    (i !== array.length &&
+                      prePayrollWorker.area.code !== array[i + 1].area.code &&
+                      prePayrollWorker.department.code !==
+                        array[i + 1].department.code)
+                  ) {
+                    // ultima iteracion y ultimo elemento del area
+                    <Fragment key={i}>
+                      <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                        <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
+                          {prePayrollWorker.code}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {`${prePayrollWorker.ci} - ${prePayrollWorker.name} (${prePayrollWorker.occupation.name})`}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {prePayrollWorker.hTrab}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {prePayrollWorker.hNoTrab}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {prePayrollWorker.impunt}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {prePayrollWorker.diasVac}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {prePayrollWorker.hrsCertif}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {prePayrollWorker.hrsLicMatern}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {prePayrollWorker.hrsResol}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {prePayrollWorker.hrsInterr}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {prePayrollWorker.otroTpoPagar}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {prePayrollWorker.hrsExtras}
+                        </Table.Cell>
+                      </Table.Row>
+                      <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                        <Table.Cell colSpan={2}>
+                          Total por Departamento
+                        </Table.Cell>
+                        {getTotalDepartments(prePayrollWorker).map(
+                          (total, i) => {
+                            return (
+                              <Table.Cell key={i} className="text-center">
+                                {total}
+                              </Table.Cell>
+                            );
+                          }
+                        )}
+                      </Table.Row>
+                      <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                        <Table.Cell colSpan={2}>Total por Área</Table.Cell>
+                        {getTotalDepartments(prePayrollWorker).map(
+                          (total, i) => {
+                            return (
+                              <Table.Cell key={i} className="text-center">
+                                {total}
+                              </Table.Cell>
+                            );
+                          }
+                        )}
+                      </Table.Row>
+                    </Fragment>;
+                  } else {
+                    return (
+                      <Table.Row
+                        key={i}
+                        className="bg-white dark:border-gray-700 dark:bg-gray-800"
+                      >
+                        <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
+                          {prePayrollWorker.code}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {`${prePayrollWorker.ci} - ${prePayrollWorker.name} (${prePayrollWorker.occupation.name})`}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {prePayrollWorker.hTrab}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {prePayrollWorker.hNoTrab}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {prePayrollWorker.impunt}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {prePayrollWorker.diasVac}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {prePayrollWorker.hrsCertif}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {prePayrollWorker.hrsLicMatern}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {prePayrollWorker.hrsResol}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {prePayrollWorker.hrsInterr}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {prePayrollWorker.otroTpoPagar}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {prePayrollWorker.hrsExtras}
+                        </Table.Cell>
+                      </Table.Row>
+                    );
+                  }
                 })
               ) : (
                 <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">

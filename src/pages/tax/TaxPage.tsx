@@ -17,6 +17,7 @@ import { ERROR_MESSAGES } from "../../constants/app";
 import { GET_LIST_TAXS } from "../../constants/endpoints/tax";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { useMiddleware } from "../../hooks/useMiddleware";
 
 const initialNewTax: NewTax = {
   type: "seguridad social",
@@ -43,6 +44,8 @@ const TaxPage = () => {
     maxValue: "",
     percentage: "",
   });
+
+  useMiddleware("economia");
 
   useEffect(() => {
     // llamada a la api
