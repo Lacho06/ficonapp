@@ -9,12 +9,17 @@ import {
   Table,
   TextInput,
 } from "flowbite-react";
+import {
+  DELETE_USER,
+  GET_LIST_USERS,
+  POST_CREATE_USER,
+  PUT_UPDATE_USER,
+} from "../../constants/endpoints/user";
 import { NewUser, User } from "../../constants/types/user";
 import { ROUTE_HOME_URL, ROUTE_USERS_URL } from "../../constants/routes/routes";
 import { useEffect, useState } from "react";
 
 import { ERROR_MESSAGES } from "../../constants/app";
-import { GET_LIST_USERS } from "../../constants/endpoints/user";
 import { HiHome } from "react-icons/hi";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { Link } from "react-router-dom";
@@ -151,10 +156,12 @@ const UserPage = () => {
       newError.email === "" &&
       newError.password === ""
     ) {
-      // todo llamada a la api para obtener un id disponible
-      const newId = 100;
-      setUsers([...users, { id: newId, ...newUser }]);
-      setNewUser(initialNewUser);
+      // llamada a la api para guardar la info
+      axios.post(POST_CREATE_USER, newUser).then(({ data }) => {
+        const newId = data.id;
+        setUsers([...users, { id: newId, ...newUser }]);
+        setNewUser(initialNewUser);
+      });
       closeModalAdd();
     }
   };
@@ -233,7 +240,8 @@ const UserPage = () => {
       newError.email === "" &&
       newError.password === ""
     ) {
-      // todo llamada a la api para modificar los datos
+      // llamada a la api para modificar los datos
+      axios.put(`${PUT_UPDATE_USER}/${userSelected.id}`, userSelected);
       const usersFiltered = users.filter((user) => user.id !== userSelected.id);
       const sortedUsers = [...usersFiltered, userSelected].sort(
         (a: User, b: User) => a.id - b.id
@@ -246,7 +254,8 @@ const UserPage = () => {
 
   const deleteUser = () => {
     if (!userSelected) return;
-    // todo llamada a la api para eliminar el usuario
+    // llamada a la api para eliminar el usuario
+    axios.delete(`${DELETE_USER}/${userSelected.id}`);
     const usersFiltered = users.filter((user) => user.id !== userSelected.id);
     setUsers(usersFiltered);
     setUserSelected(undefined);
@@ -475,7 +484,7 @@ const UserPage = () => {
                 id="image"
                 name="image"
                 color="info"
-                value={newUser && newUser.image}
+                value={(newUser && newUser.image) || ""}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setNewUser({ ...newUser, [e.target.name]: e.target.value })
                 }
@@ -578,6 +587,7 @@ const UserPage = () => {
               <TextInput
                 id="password"
                 name="password"
+                type="password"
                 placeholder="********"
                 value={userSelected && userSelected.password}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -639,7 +649,7 @@ const UserPage = () => {
                 name="image"
                 color="info"
                 helperText="Inserte una imagen para su perfil"
-                value={userSelected && userSelected.image}
+                value={(userSelected && userSelected.image) || ""}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   userSelected &&
                   setUserSelected({

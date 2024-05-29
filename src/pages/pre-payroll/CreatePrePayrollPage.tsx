@@ -11,6 +11,10 @@ import {
 import { ERROR_MESSAGES, MONTHS } from "../../constants/app";
 import { Link, useNavigate } from "react-router-dom";
 import {
+  POST_CREATE_PRE_PAYROLL,
+  POST_CREATE_PRE_PAYROLL_WORKER,
+} from "../../constants/endpoints/prepayroll";
+import {
   PrePayrollBase,
   PrePayrollWorker,
 } from "../../constants/types/prepayroll";
@@ -380,8 +384,6 @@ const CreatePrePayrollPage = () => {
       newError.otroTpoPagar === "" &&
       newError.hrsExtras === ""
     ) {
-      // todo llamada a la api para obtener un id disponible
-      // worker seleccionado
       const worker = workers.filter(
         (worker) => worker.name === newPrePayrollWorker.name
       )[0];
@@ -649,7 +651,6 @@ const CreatePrePayrollPage = () => {
       newError.otroTpoPagar === "" &&
       newError.hrsExtras === ""
     ) {
-      // todo llamada a la api para obtener un id disponible
       const prePayrollWorkerFiltereds = prePayrollWorkers.filter(
         (worker) => worker.name !== prePayrollWorkerSelected.name
       );
@@ -657,7 +658,7 @@ const CreatePrePayrollPage = () => {
       setPrePayrollWorkers(
         [...prePayrollWorkerFiltereds, prePayrollWorkerSelected].sort(
           (a: PrePayrollWorker, b: PrePayrollWorker) => {
-            return a.name - b.name;
+            return a.code - b.code;
           }
         )
       );
@@ -701,7 +702,21 @@ const CreatePrePayrollPage = () => {
     }
 
     if (newError.month === "" && newError.year === "") {
-      // todo llamar a la api para guardar los datos
+      // llamar a la api para guardar los datos
+      axios.post(POST_CREATE_PRE_PAYROLL, prePayroll).then(({ data }) => {
+        const prePayrollId = data.id;
+        prePayrollWorkers.map((prePayrollWorker) => {
+          const workerId = workersReserved.filter(
+            (worker) => worker.ci === prePayrollWorker.ci
+          )[0].ci;
+          const newPrePayrollWorker = {
+            workerId: workerId,
+            prepayrollId: prePayrollId,
+            ...prePayrollWorker,
+          };
+          axios.post(POST_CREATE_PRE_PAYROLL_WORKER, newPrePayrollWorker);
+        });
+      });
       navigate(ROUTE_PRE_PAYROLL_URL);
     }
   };

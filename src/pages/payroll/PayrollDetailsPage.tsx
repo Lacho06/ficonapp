@@ -1,15 +1,19 @@
 import { Breadcrumb, CustomFlowbiteTheme, Table } from "flowbite-react";
+import { Fragment, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import {
+  PayrollTable,
+  PayrollWorkerTable,
+} from "../../constants/types/payroll";
 import {
   ROUTE_HOME_URL,
   ROUTE_PAYROLL_DETAILS_PREFIX,
   ROUTE_PAYROLL_URL,
 } from "../../constants/routes/routes";
-import { useEffect, useState } from "react";
+import { getLimitDay, getNumberMonth } from "../../services/app";
 
 import { GET_PAYROLL_DETAILS } from "../../constants/endpoints/payrolls";
 import { HiHome } from "react-icons/hi";
-import { PayrollTable } from "../../constants/types/payroll";
 import axios from "axios";
 import { useMiddleware } from "../../hooks/useMiddleware";
 
@@ -18,6 +22,46 @@ const PayrollDetailsPage = () => {
   const [payrollDetails, setPayrollDetails] = useState<PayrollTable>();
 
   useMiddleware("economia");
+
+  const getTotalDepartments = (payrollWorker: PayrollWorkerTable) => {
+    if (!payrollDetails) return [];
+    let totalSalaryRate = 0;
+    let totalHours = 0;
+    let totalToCollect = 0;
+    let totalBonus = 0;
+    let totalPAT = 0;
+    let totalEarnedSalary = 0;
+    let totalSalaryTax = 0;
+    let totalWithHoldings = 0;
+    let totalPaid = 0;
+
+    const payrollWorkersFiltereds = payrollDetails.workers.filter(
+      (worker) => worker.department.code === payrollWorker.department.code
+    );
+    payrollWorkersFiltereds.map((worker) => {
+      totalSalaryRate += worker.salaryRate;
+      totalHours += worker.hours;
+      totalToCollect += worker.toCollect;
+      totalBonus += worker.bonus;
+      totalPAT += worker.pat;
+      totalEarnedSalary += worker.earnedSalary;
+      totalSalaryTax += worker.salaryTax;
+      totalWithHoldings += worker.withHoldings;
+      totalPaid += worker.paid;
+    });
+
+    return [
+      totalSalaryRate,
+      totalHours,
+      totalToCollect,
+      totalBonus,
+      totalPAT,
+      totalEarnedSalary,
+      totalSalaryTax,
+      totalWithHoldings,
+      totalPaid,
+    ];
+  };
 
   useEffect(() => {
     axios.get(`${GET_PAYROLL_DETAILS}/${id}`).then(({ data }) => {
@@ -59,6 +103,23 @@ const PayrollDetailsPage = () => {
           </Breadcrumb>
         </div>
         <div className="overflow-x-auto col-span-12">
+          <div className="flex flex-col font-bold gap-1 mb-3">
+            <span>GEIC - MINCOM</span>
+            <span>161.0.2652 - SOFTEL</span>
+            <span>890 - SOFTEL</span>
+            <span>
+              34 - Nómina de salario{" "}
+              {`${payrollDetails?.month} ${payrollDetails?.year}`}
+            </span>
+            <span>
+              Período de pago{" "}
+              {`1/${payrollDetails && getNumberMonth(payrollDetails.month)}/${
+                payrollDetails?.year
+              } al ${payrollDetails && getLimitDay(payrollDetails.month)}/${
+                payrollDetails && getNumberMonth(payrollDetails.month)
+              }/${payrollDetails?.year}`}
+            </span>
+          </div>
           <Table theme={customTheme}>
             <Table.Head>
               <Table.HeadCell colSpan={13} className="text-center">
@@ -88,53 +149,186 @@ const PayrollDetailsPage = () => {
             </Table.Head>
             <Table.Body className="divide-y">
               {payrollDetails && payrollDetails.workers.length > 0 ? (
-                payrollDetails.workers.map((payrollWorker, i) => {
-                  return (
-                    <Table.Row
-                      key={i}
-                      className="bg-white dark:border-gray-700 dark:bg-gray-800"
-                    >
-                      <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
-                        {payrollWorker.worker.code}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {payrollWorker.worker.name}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {payrollWorker.worker.ci}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {payrollWorker.occupation.name}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {payrollWorker.salaryRate}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {payrollWorker.hours}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {payrollWorker.toCollect}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {payrollWorker.bonus}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {payrollWorker.pat}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {payrollWorker.earnedSalary}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {payrollWorker.salaryTax}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {payrollWorker.withHoldings}
-                      </Table.Cell>
-                      <Table.Cell className="text-center font-bold">
-                        {payrollWorker.paid}
-                      </Table.Cell>
-                    </Table.Row>
-                  );
+                payrollDetails.workers.map((payrollWorker, i, array) => {
+                  if (
+                    i === 0 ||
+                    (i > 0 &&
+                      payrollWorker.department.code !==
+                        array[i - 1].department.code)
+                  ) {
+                    // primera iteracion y primer elemento de diferente departamento
+                    return (
+                      <Fragment key={i}>
+                        <Table.Row className="bg-accent-700 dark:border-gray-700 dark:bg-gray-800">
+                          <Table.Cell
+                            colSpan={13}
+                            className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white"
+                          >
+                            {`${payrollWorker.department.code} - ${payrollWorker.department.name}`}
+                          </Table.Cell>
+                        </Table.Row>
+                        <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                          <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
+                            {payrollWorker.worker.code}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {payrollWorker.worker.name}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {payrollWorker.worker.ci}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {payrollWorker.occupation.name}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {payrollWorker.salaryRate}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {payrollWorker.hours}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {payrollWorker.toCollect}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {payrollWorker.bonus}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {payrollWorker.pat}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {payrollWorker.earnedSalary}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {payrollWorker.salaryTax}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {payrollWorker.withHoldings}
+                          </Table.Cell>
+                          <Table.Cell className="text-center font-bold">
+                            {payrollWorker.paid}
+                          </Table.Cell>
+                        </Table.Row>
+                      </Fragment>
+                    );
+                  } else if (
+                    i === array.length - 1 ||
+                    (i < array.length - 1 &&
+                      payrollWorker.department.code !==
+                        array[i + 1].department.code)
+                  ) {
+                    return (
+                      <Fragment key={i}>
+                        <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                          <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
+                            {payrollWorker.worker.code}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {payrollWorker.worker.name}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {payrollWorker.worker.ci}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {payrollWorker.occupation.name}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {payrollWorker.salaryRate}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {payrollWorker.hours}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {payrollWorker.toCollect}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {payrollWorker.bonus}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {payrollWorker.pat}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {payrollWorker.earnedSalary}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {payrollWorker.salaryTax}
+                          </Table.Cell>
+                          <Table.Cell className="text-center">
+                            {payrollWorker.withHoldings}
+                          </Table.Cell>
+                          <Table.Cell className="text-center font-bold">
+                            {payrollWorker.paid}
+                          </Table.Cell>
+                        </Table.Row>
+                        <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                          <Table.Cell
+                            colSpan={4}
+                            className="uppercase font-bold"
+                          >
+                            Total por C. Costo
+                          </Table.Cell>
+                          {getTotalDepartments(payrollWorker).map(
+                            (total, j) => {
+                              return (
+                                <Table.Cell
+                                  key={j}
+                                  className="text-center font-bold"
+                                >
+                                  {total}
+                                </Table.Cell>
+                              );
+                            }
+                          )}
+                        </Table.Row>
+                      </Fragment>
+                    );
+                  } else {
+                    return (
+                      <Table.Row
+                        key={i}
+                        className="bg-white dark:border-gray-700 dark:bg-gray-800"
+                      >
+                        <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
+                          {payrollWorker.worker.code}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {payrollWorker.worker.name}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {payrollWorker.worker.ci}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {payrollWorker.occupation.name}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {payrollWorker.salaryRate}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {payrollWorker.hours}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {payrollWorker.toCollect}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {payrollWorker.bonus}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {payrollWorker.pat}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {payrollWorker.earnedSalary}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {payrollWorker.salaryTax}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {payrollWorker.withHoldings}
+                        </Table.Cell>
+                        <Table.Cell className="text-center font-bold">
+                          {payrollWorker.paid}
+                        </Table.Cell>
+                      </Table.Row>
+                    );
+                  }
                 })
               ) : (
                 <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">

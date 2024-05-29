@@ -25,9 +25,10 @@ LIST TODO:
 ✅ Arreglar los Select de los modales
 ✅ Agregar Selects para la ocupacion y el dpto en WorkerPage
 ✅ Agregar roles
+✅ Arreglar la tabla de la nomina y la prenomina
+✅ Consumir los endpoints
 Agregar loader
 Arreglar la apariencia del link del navbar
-Arreglar la tabla de la nomina y la prenomina
-Vista detalle del trabajador agregar tabla de nominas y prenominas
+Agregar los alert
+Agregar el encabezado de la prenomina y de la nomina
 Responsive de todas las vistas
-Consumir los endpoints

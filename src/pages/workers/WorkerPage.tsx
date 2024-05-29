@@ -8,6 +8,12 @@ import {
   Table,
   TextInput,
 } from "flowbite-react";
+import {
+  DELETE_WORKER,
+  GET_LIST_WORKERS,
+  POST_CREATE_WORKER,
+  PUT_UPDATE_WORKER,
+} from "../../constants/endpoints/worker";
 import { NewWorker, Worker } from "../../constants/types/worker";
 import {
   ROUTE_HOME_URL,
@@ -19,10 +25,11 @@ import { useEffect, useState } from "react";
 import { Department } from "../../constants/types/department";
 import { ERROR_MESSAGES } from "../../constants/app";
 import { GET_LIST_DEPARTMENTS } from "../../constants/endpoints/department";
-import { GET_LIST_WORKERS } from "../../constants/endpoints/worker";
+import { GET_LIST_OCCUPATIONS } from "../../constants/endpoints/occupation";
 import { HiHome } from "react-icons/hi";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { Link } from "react-router-dom";
+import { Occupation } from "../../constants/types/occupation";
 import axios from "axios";
 import { useMiddleware } from "../../hooks/useMiddleware";
 
@@ -30,14 +37,16 @@ const initialNewWorker: NewWorker = {
   name: "",
   ci: 0,
   category: "ingeniero",
-  department: "",
+  departmentCode: -1,
+  occupationId: -1,
 };
 
 type ErrorWorkerFields = {
   name: string;
   ci: string;
   category: string;
-  department: string;
+  departmentCode: string;
+  occupationId: string;
 };
 
 const WorkerPage = () => {
@@ -45,11 +54,13 @@ const WorkerPage = () => {
   const [workerSelected, setWorkerSelected] = useState<Worker>();
   const [newWorker, setNewWorker] = useState<NewWorker>(initialNewWorker);
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [occupations, setOccupations] = useState<Occupation[]>([]);
   const [error, setError] = useState<ErrorWorkerFields>({
     name: "",
     ci: "",
     category: "",
-    department: "",
+    departmentCode: "",
+    occupationId: "",
   });
 
   useMiddleware("rec. humanos");
@@ -58,6 +69,7 @@ const WorkerPage = () => {
     // llamada a la api
     axios.get(GET_LIST_WORKERS).then(({ data }) => setWorkers(data));
     axios.get(GET_LIST_DEPARTMENTS).then(({ data }) => setDepartments(data));
+    axios.get(GET_LIST_OCCUPATIONS).then(({ data }) => setOccupations(data));
   }, []);
 
   const [openModalAdd, setOpenModalAdd] = useState(false);
@@ -92,7 +104,8 @@ const WorkerPage = () => {
       name: "",
       ci: "",
       category: "",
-      department: "",
+      departmentCode: "",
+      occupationId: "",
     };
 
     if (newWorker.name.trim() === "") {
@@ -156,26 +169,51 @@ const WorkerPage = () => {
       setError(newError);
     }
 
-    if (newWorker.department.trim() === "") {
+    if (newWorker.departmentCode === -1) {
       newError = {
         ...newError,
-        department: ERROR_MESSAGES.EMPTY_FIELD,
+        departmentCode: ERROR_MESSAGES.EMPTY_FIELD,
       };
       setError(newError);
     } else if (
       departments.every(
-        (department) => department.name !== newWorker.department
+        (department) => department.code !== newWorker.departmentCode
       )
     ) {
       newError = {
         ...newError,
-        department: ERROR_MESSAGES.INCORRECT_FIELD,
+        departmentCode: ERROR_MESSAGES.INCORRECT_FIELD,
       };
       setError(newError);
     } else {
       newError = {
         ...newError,
-        department: "",
+        departmentCode: "",
+      };
+      setError(newError);
+    }
+
+    if (newWorker.occupationId === -1) {
+      newError = {
+        ...newError,
+        occupationId: ERROR_MESSAGES.EMPTY_FIELD,
+      };
+      setError(newError);
+    } else if (
+      occupations.every(
+        (occupation) =>
+          occupation.id.toString() !== newWorker.occupationId.toString()
+      )
+    ) {
+      newError = {
+        ...newError,
+        occupationId: ERROR_MESSAGES.INCORRECT_FIELD,
+      };
+      setError(newError);
+    } else {
+      newError = {
+        ...newError,
+        occupationId: "",
       };
       setError(newError);
     }
@@ -184,12 +222,15 @@ const WorkerPage = () => {
       newError.name === "" &&
       newError.ci === "" &&
       newError.category === "" &&
-      newError.department === ""
+      newError.departmentCode === "" &&
+      newError.occupationId === ""
     ) {
-      // todo llamada a la api para obtener un id disponible
-      const newCode = 100;
-      setWorkers([...workers, { code: newCode, ...newWorker }]);
-      setNewWorker(initialNewWorker);
+      // llamada a la api para obtener un id disponible
+      axios.post(POST_CREATE_WORKER, newWorker).then(({ data }) => {
+        const newCode = data.id;
+        setWorkers([...workers, { code: newCode, ...newWorker }]);
+        setNewWorker(initialNewWorker);
+      });
       closeModalAdd();
     }
   };
@@ -201,6 +242,8 @@ const WorkerPage = () => {
       name: "",
       ci: "",
       category: "",
+      departmentCode: "",
+      occupationId: "",
     };
 
     if (workerSelected.name.trim() === "") {
@@ -264,12 +307,64 @@ const WorkerPage = () => {
       setError(newError);
     }
 
+    if (workerSelected.departmentCode === -1) {
+      newError = {
+        ...newError,
+        departmentCode: ERROR_MESSAGES.EMPTY_FIELD,
+      };
+      setError(newError);
+    } else if (
+      departments.every(
+        (department) => department.code !== workerSelected.departmentCode
+      )
+    ) {
+      newError = {
+        ...newError,
+        departmentCode: ERROR_MESSAGES.INCORRECT_FIELD,
+      };
+      setError(newError);
+    } else {
+      newError = {
+        ...newError,
+        departmentCode: "",
+      };
+      setError(newError);
+    }
+
+    if (workerSelected.occupationId === -1) {
+      newError = {
+        ...newError,
+        occupationId: ERROR_MESSAGES.EMPTY_FIELD,
+      };
+      setError(newError);
+    } else if (
+      occupations.every(
+        (occupation) =>
+          occupation.id.toString() !== workerSelected.occupationId.toString()
+      )
+    ) {
+      newError = {
+        ...newError,
+        occupationId: ERROR_MESSAGES.INCORRECT_FIELD,
+      };
+      setError(newError);
+    } else {
+      newError = {
+        ...newError,
+        occupationId: "",
+      };
+      setError(newError);
+    }
+
     if (
       newError.name === "" &&
       newError.ci === "" &&
-      newError.category === ""
+      newError.category === "" &&
+      newError.departmentCode === "" &&
+      newError.occupationId === ""
     ) {
-      // todo llamada a la api para modificar los datos
+      // llamada a la api para modificar los datos
+      axios.put(`${PUT_UPDATE_WORKER}/${workerSelected.code}`, workerSelected);
       const workersFiltered = workers.filter(
         (worker) => worker.code !== workerSelected.code
       );
@@ -284,7 +379,8 @@ const WorkerPage = () => {
 
   const deleteWorker = () => {
     if (!workerSelected) return;
-    // todo llamada a la api para eliminar el trabajador
+    // llamada a la api para eliminar el trabajador
+    axios.delete(`${DELETE_WORKER}/${workerSelected.code}`);
     const workerFiltered = workers.filter(
       (worker) => worker.code !== workerSelected.code
     );
@@ -496,13 +592,29 @@ const WorkerPage = () => {
             </div>
             <div>
               <div className="mb-2 block">
-                <Label htmlFor="department" value="Departamento" />
+                <Label htmlFor="departmentCode" value="Departamento" />
                 <span className="text-red-800 mx-1 font-bold">*</span>
               </div>
               <Select
-                id="department"
-                name="department"
-                value={newWorker.department}
+                id="departmentCode"
+                name="departmentCode"
+                value={newWorker.departmentCode}
+                color={
+                  newWorker.departmentCode === -1 && error.departmentCode === ""
+                    ? "warning"
+                    : error.departmentCode !== ""
+                    ? "failure"
+                    : "gray"
+                }
+                helperText={
+                  error.departmentCode !== "" && (
+                    <>
+                      <span className="font-medium">
+                        {error.departmentCode}
+                      </span>
+                    </>
+                  )
+                }
                 required
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                   setNewWorker({
@@ -516,8 +628,51 @@ const WorkerPage = () => {
                 </option>
                 {departments.map((department, i) => {
                   return (
-                    <option key={i} value={department.name}>
+                    <option key={i} value={department.code}>
                       {department.name}
+                    </option>
+                  );
+                })}
+              </Select>
+            </div>
+            <div>
+              <div className="mb-2 block">
+                <Label htmlFor="occupationId" value="Cargo" />
+                <span className="text-red-800 mx-1 font-bold">*</span>
+              </div>
+              <Select
+                id="occupationId"
+                name="occupationId"
+                value={newWorker.occupationId}
+                required
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                  setNewWorker({
+                    ...newWorker,
+                    [e.target.name]: e.target.value,
+                  })
+                }
+                color={
+                  newWorker.occupationId === -1 && error.occupationId === ""
+                    ? "warning"
+                    : error.occupationId !== ""
+                    ? "failure"
+                    : "gray"
+                }
+                helperText={
+                  error.occupationId !== "" && (
+                    <>
+                      <span className="font-medium">{error.occupationId}</span>
+                    </>
+                  )
+                }
+              >
+                <option value="" disabled>
+                  Seleccione un cargo
+                </option>
+                {occupations.map((occupation, i) => {
+                  return (
+                    <option key={i} value={occupation.id}>
+                      {occupation.name}
                     </option>
                   );
                 })}
@@ -666,13 +821,13 @@ const WorkerPage = () => {
             </div>
             <div>
               <div className="mb-2 block">
-                <Label htmlFor="department" value="Departamento" />
+                <Label htmlFor="departmentCode" value="Departamento" />
                 <span className="text-red-800 mx-1 font-bold">*</span>
               </div>
               <Select
-                id="department"
-                name="department"
-                value={workerSelected && workerSelected.department}
+                id="departmentCode"
+                name="departmentCode"
+                value={workerSelected && workerSelected.departmentCode}
                 required
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                   workerSelected &&
@@ -681,19 +836,92 @@ const WorkerPage = () => {
                     [e.target.name]: e.target.value,
                   })
                 }
+                color={
+                  workerSelected &&
+                  workerSelected.departmentCode === 0 &&
+                  error.departmentCode === ""
+                    ? "warning"
+                    : error.departmentCode !== ""
+                    ? "failure"
+                    : "gray"
+                }
+                helperText={
+                  error.departmentCode !== "" && (
+                    <>
+                      <span className="font-medium">
+                        {error.departmentCode}
+                      </span>
+                    </>
+                  )
+                }
               >
-                <option value="">Seleccione un departamento</option>
+                <option value="" disabled>
+                  Seleccione un departamento
+                </option>
                 {departments.map((department, i) => {
                   return (
                     <option
-                      value={department.name}
+                      value={department.code}
                       key={i}
                       defaultChecked={
                         workerSelected &&
-                        department.name === workerSelected.department
+                        department.code === workerSelected.departmentCode
                       }
                     >
                       {department.name}
+                    </option>
+                  );
+                })}
+              </Select>
+            </div>
+            <div>
+              <div className="mb-2 block">
+                <Label htmlFor="occupationId" value="Cargo" />
+                <span className="text-red-800 mx-1 font-bold">*</span>
+              </div>
+              <Select
+                id="occupationId"
+                name="occupationId"
+                value={workerSelected && workerSelected.occupationId}
+                required
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                  workerSelected &&
+                  setWorkerSelected({
+                    ...workerSelected,
+                    [e.target.name]: e.target.value,
+                  })
+                }
+                color={
+                  workerSelected &&
+                  workerSelected.occupationId === 0 &&
+                  error.occupationId === ""
+                    ? "warning"
+                    : error.occupationId !== ""
+                    ? "failure"
+                    : "gray"
+                }
+                helperText={
+                  error.occupationId !== "" && (
+                    <>
+                      <span className="font-medium">{error.occupationId}</span>
+                    </>
+                  )
+                }
+              >
+                <option value="" disabled>
+                  Seleccione un cargo
+                </option>
+                {occupations.map((occupation, i) => {
+                  return (
+                    <option
+                      value={occupation.id}
+                      key={i}
+                      defaultChecked={
+                        workerSelected &&
+                        occupation.id === workerSelected.occupationId
+                      }
+                    >
+                      {occupation.name}
                     </option>
                   );
                 })}

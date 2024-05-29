@@ -13,19 +13,18 @@ const HomePage = () => {
     <>
       <div className="flex my-5">
         <main className="grid grid-cols-12 gap-4 mx-auto">
-          {user && user.role === "economia" && (
+          {user && user.role === "rec. humanos" ? (
             <CardHome
-              url={ROUTE_PAYROLL_URL}
-              name="N&oacute;mina"
+              url={ROUTE_PRE_PAYROLL_URL}
+              name="Pren&oacute;mina"
               icon="../../src/assets/icons/payroll-white.svg"
               bgIcon="../../src/assets/icons/payroll.svg"
               className="col-span-12 sm:col-span-6 md:col-span-4 lg:col-span-3"
             />
-          )}
-          {user && user.role === "rec. humanos" && (
+          ) : (
             <CardHome
-              url={ROUTE_PRE_PAYROLL_URL}
-              name="Pren&oacute;mina"
+              url={ROUTE_PAYROLL_URL}
+              name="N&oacute;mina"
               icon="../../src/assets/icons/payroll-white.svg"
               bgIcon="../../src/assets/icons/payroll.svg"
               className="col-span-12 sm:col-span-6 md:col-span-4 lg:col-span-3"

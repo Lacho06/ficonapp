@@ -9,7 +9,7 @@ import {
   TextInput,
 } from "flowbite-react";
 import {
-  GET_LIST_PRE_PAYROLLS,
+  GET_LIST_PRE_PAYROLLS_NOT_ADDED,
   GET_PRE_PAYROLL_WORKERS_BY_ID,
 } from "../../constants/endpoints/prepayroll";
 import { Link, useNavigate } from "react-router-dom";
@@ -26,6 +26,7 @@ import { useEffect, useState } from "react";
 
 import { ERROR_MESSAGES } from "../../constants/app";
 import { HiHome } from "react-icons/hi";
+import { POST_CREATE_PAYROLL } from "../../constants/endpoints/payrolls";
 import axios from "axios";
 import { toDecimal } from "../../services/app";
 import { useMiddleware } from "../../hooks/useMiddleware";
@@ -61,7 +62,7 @@ const CreatePayrollPage = () => {
   useMiddleware("economia");
 
   useEffect(() => {
-    axios.get(GET_LIST_PRE_PAYROLLS).then(({ data }) => {
+    axios.get(GET_LIST_PRE_PAYROLLS_NOT_ADDED).then(({ data }) => {
       setPrePayrolls(data);
     });
   }, []);
@@ -100,6 +101,7 @@ const CreatePayrollPage = () => {
 
   const savePayroll = () => {
     // llamar a la api para guardar los datos
+    axios.post(POST_CREATE_PAYROLL, payroll);
     navigate(ROUTE_PAYROLL_URL);
   };
 
@@ -247,7 +249,6 @@ const CreatePayrollPage = () => {
       newError.pat === "" &&
       newError.withHoldings === ""
     ) {
-      // todo llamada a la api para obtener un id disponible
       const payrollWorkerFiltereds = payroll.workers.filter(
         (payrollWorker) =>
           payrollWorker.worker.name !== payrollWorkerSelected.worker.name
@@ -257,7 +258,7 @@ const CreatePayrollPage = () => {
         ...payroll,
         workers: [...payrollWorkerFiltereds, payrollWorkerSelected].sort(
           (a: PayrollWorker, b: PayrollWorker) => {
-            return a.worker.name - b.worker.name;
+            return a.worker.ci - b.worker.ci;
           }
         ),
       });

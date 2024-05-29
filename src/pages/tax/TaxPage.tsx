@@ -8,13 +8,18 @@ import {
   Table,
   TextInput,
 } from "flowbite-react";
+import {
+  DELETE_TAX,
+  GET_LIST_TAXS,
+  POST_CREATE_TAX,
+  PUT_UPDATE_TAX,
+} from "../../constants/endpoints/tax";
 import { HiHome, HiOutlineExclamationCircle } from "react-icons/hi";
 import { NewTax, Tax } from "../../constants/types/tax";
 import { ROUTE_HOME_URL, ROUTE_TAX_URL } from "../../constants/routes/routes";
 import { useEffect, useState } from "react";
 
 import { ERROR_MESSAGES } from "../../constants/app";
-import { GET_LIST_TAXS } from "../../constants/endpoints/tax";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useMiddleware } from "../../hooks/useMiddleware";
@@ -189,21 +194,25 @@ const TaxPage = () => {
       newError.percentage === ""
     ) {
       if (newTax.type === "ingresos personales") {
-        // todo llamada a la api para obtener un id disponible
-        const newId = 100;
-        const sorted = [...ingTaxs, { id: newId, ...newTax }].sort(
-          (a: Tax, b: Tax) => a.minValue - b.minValue
-        );
-        setIngTaxs(sorted);
+        // llamada a la api para obtener un id disponible
+        axios.post(POST_CREATE_TAX, newTax).then(({ data }) => {
+          const newId = data.id;
+          const sorted = [...ingTaxs, { id: newId, ...newTax }].sort(
+            (a: Tax, b: Tax) => a.minValue - b.minValue
+          );
+          setIngTaxs(sorted);
+        });
       }
 
       if (newTax.type === "seguridad social") {
-        // todo llamada a la api para obtener un id disponible
-        const newId = 100;
-        const sorted = [...segTaxs, { id: newId, ...newTax }].sort(
-          (a: Tax, b: Tax) => a.minValue - b.minValue
-        );
-        setSegTaxs(sorted);
+        // llamada a la api para obtener un id disponible
+        axios.post(POST_CREATE_TAX, newTax).then(({ data }) => {
+          const newId = data.id;
+          const sorted = [...segTaxs, { id: newId, ...newTax }].sort(
+            (a: Tax, b: Tax) => a.minValue - b.minValue
+          );
+          setSegTaxs(sorted);
+        });
       }
 
       setNewTax(initialNewTax);
@@ -310,7 +319,8 @@ const TaxPage = () => {
       newError.maxValue === "" &&
       newError.percentage === ""
     ) {
-      // todo llamada a la api para modificar los datos
+      // llamada a la api para modificar los datos
+      axios.put(`${PUT_UPDATE_TAX}/${taxSelected.id}`, taxSelected);
       if (taxSelected.type === "ingresos personales") {
         const taxsFiltered = ingTaxs.filter(
           (ingTax) => ingTax.id !== taxSelected.id
@@ -338,15 +348,15 @@ const TaxPage = () => {
   const deleteTax = () => {
     if (!taxSelected) return;
 
+    // llamada a la api para eliminar el impuesto
+    axios.delete(`${DELETE_TAX}/${taxSelected.id}`);
     if (taxSelected.type === "ingresos personales") {
-      // todo llamada a la api para eliminar el usuario
       const taxsFiltered = ingTaxs.filter(
         (ingTax) => ingTax.id !== taxSelected.id
       );
       setIngTaxs(taxsFiltered);
     }
     if (taxSelected.type === "seguridad social") {
-      // todo llamada a la api para eliminar el usuario
       const taxsFiltered = segTaxs.filter(
         (segTax) => segTax.id !== taxSelected.id
       );

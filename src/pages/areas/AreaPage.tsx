@@ -8,12 +8,17 @@ import {
   Table,
   TextInput,
 } from "flowbite-react";
+import {
+  DELETE_AREA,
+  GET_LIST_AREAS,
+  POST_CREATE_AREA,
+  PUT_UPDATE_AREA,
+} from "../../constants/endpoints/area";
 import { HiHome, HiOutlineExclamationCircle } from "react-icons/hi";
 import { ROUTE_AREAS_URL, ROUTE_HOME_URL } from "../../constants/routes/routes";
 import { useEffect, useState } from "react";
 
 import { ERROR_MESSAGES } from "../../constants/app";
-import { GET_LIST_AREAS } from "../../constants/endpoints/area";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useMiddleware } from "../../hooks/useMiddleware";
@@ -88,10 +93,12 @@ const AreaPage = () => {
     }
 
     if (newError.name === "") {
-      // todo llamada a la api para obtener un id disponible
-      const newCode = 100;
-      setAreas([...areas, { code: newCode, ...newArea }]);
-      setNewArea(initialNewArea);
+      // llamada a la api para obtener un id disponible
+      axios.post(POST_CREATE_AREA, newArea).then(({ data }) => {
+        const newCode = data.code;
+        setAreas([...areas, { code: newCode, ...newArea }]);
+        setNewArea(initialNewArea);
+      });
       closeModalAdd();
     }
   };
@@ -118,7 +125,8 @@ const AreaPage = () => {
     }
 
     if (newError.name === "") {
-      // todo llamada a la api para modificar los datos
+      // llamada a la api para modificar los datos
+      axios.put(`${PUT_UPDATE_AREA}/${areaSelected.code}`, areaSelected);
       const areasFiltered = areas.filter(
         (area) => area.code !== areaSelected.code
       );
@@ -133,7 +141,8 @@ const AreaPage = () => {
 
   const deleteArea = () => {
     if (!areaSelected) return;
-    // todo llamada a la api para eliminar el area
+    // llamada a la api para eliminar el area
+    axios.delete(`${DELETE_AREA}/${areaSelected.code}`);
     const areasFiltered = areas.filter(
       (area) => area.code !== areaSelected.code
     );

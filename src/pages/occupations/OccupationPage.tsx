@@ -7,6 +7,12 @@ import {
   Table,
   TextInput,
 } from "flowbite-react";
+import {
+  DELETE_OCCUPATION,
+  GET_LIST_OCCUPATIONS,
+  POST_CREATE_OCCUPATION,
+  PUT_UPDATE_OCCUPATION,
+} from "../../constants/endpoints/occupation";
 import { HiHome, HiOutlineExclamationCircle } from "react-icons/hi";
 import { NewOccupation, Occupation } from "../../constants/types/occupation";
 import {
@@ -17,7 +23,6 @@ import {
 import { useEffect, useState } from "react";
 
 import { ERROR_MESSAGES } from "../../constants/app";
-import { GET_LIST_OCCUPATIONS } from "../../constants/endpoints/occupation";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useMiddleware } from "../../hooks/useMiddleware";
@@ -120,10 +125,12 @@ const OccupationPage = () => {
     }
 
     if (newError.name === "" && newError.salary === "") {
-      // todo llamada a la api para obtener un id disponible
-      const newId = 100;
-      setOccupations([...occupations, { id: newId, ...newOccupation }]);
-      setNewOccupation(initialNewOccupation);
+      // llamada a la api para obtener un id disponible
+      axios.post(POST_CREATE_OCCUPATION, newOccupation).then(({ data }) => {
+        const newId = data.id;
+        setOccupations([...occupations, { id: newId, ...newOccupation }]);
+        setNewOccupation(initialNewOccupation);
+      });
       closeModalAdd();
     }
   };
@@ -174,7 +181,11 @@ const OccupationPage = () => {
     }
 
     if (newError.name === "" && newError.salary === "") {
-      // todo llamada a la api para modificar los datos
+      // llamada a la api para modificar los datos
+      axios.put(
+        `${PUT_UPDATE_OCCUPATION}/${occupationSelected.id}`,
+        occupationSelected
+      );
       const occupationsFiltered = occupations.filter(
         (occupation) => occupation.id !== occupationSelected.id
       );
@@ -190,7 +201,8 @@ const OccupationPage = () => {
 
   const deleteOccupation = () => {
     if (!occupationSelected) return;
-    // todo llamada a la api para eliminar el cargo
+    // llamada a la api para eliminar el cargo
+    axios.delete(`${DELETE_OCCUPATION}/${occupationSelected.id}`);
     const occupationsFiltered = occupations.filter(
       (occupation) => occupation.id !== occupationSelected.id
     );

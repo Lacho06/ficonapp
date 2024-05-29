@@ -9,6 +9,11 @@ import {
   Table,
   TextInput,
 } from "flowbite-react";
+import {
+  DELETE_DEPARTMENT,
+  GET_LIST_DEPARTMENTS,
+  POST_CREATE_DEPARTMENT,
+} from "../../constants/endpoints/department";
 import { Department, NewDepartment } from "../../constants/types/department";
 import { HiHome, HiOutlineExclamationCircle } from "react-icons/hi";
 import {
@@ -20,8 +25,8 @@ import { useEffect, useState } from "react";
 import { Area } from "../../constants/types/area";
 import { ERROR_MESSAGES } from "../../constants/app";
 import { GET_LIST_AREAS } from "../../constants/endpoints/area";
-import { GET_LIST_DEPARTMENTS } from "../../constants/endpoints/department";
 import { Link } from "react-router-dom";
+import { PUT_UPDATE_DEPARTMENT } from "./../../constants/endpoints/department";
 import axios from "axios";
 import { useMiddleware } from "../../hooks/useMiddleware";
 
@@ -126,10 +131,12 @@ const DepartmentPage = () => {
     }
 
     if (newError.name === "" && newError.areaName === "") {
-      // todo llamada a la api para obtener un id disponible
-      const newCode = 100;
-      setDepartments([...departments, { code: newCode, ...newDepartment }]);
-      setNewDepartment(initialNewDepartment);
+      // llamada a la api para obtener un id disponible
+      axios.post(POST_CREATE_DEPARTMENT, newDepartment).then(({ data }) => {
+        const newCode = data.code;
+        setDepartments([...departments, { code: newCode, ...newDepartment }]);
+        setNewDepartment(initialNewDepartment);
+      });
       closeModalAdd();
     }
   };
@@ -151,8 +158,9 @@ const DepartmentPage = () => {
       setError(newError);
     } else if (
       Number.parseInt(departmentSelected.code.toString()) === 0 ||
-      Number.parseInt(departmentSelected.code.toString()).toString().length !==
-        6
+      departments.every(
+        (department) => department.code !== departmentSelected.code
+      )
     ) {
       newError = {
         ...newError,
@@ -210,7 +218,11 @@ const DepartmentPage = () => {
       newError.name === "" &&
       newError.areaName === ""
     ) {
-      // todo llamada a la api para modificar los datos
+      // llamada a la api para modificar los datos
+      axios.put(
+        `${PUT_UPDATE_DEPARTMENT}/${departmentSelected.code}`,
+        departmentSelected
+      );
       const departmentsFiltered = departments.filter(
         (department) => department.code !== departmentSelected.code
       );
@@ -226,7 +238,8 @@ const DepartmentPage = () => {
 
   const deleteDepartment = () => {
     if (!departmentSelected) return;
-    // todo llamada a la api para eliminar el departamento
+    // llamada a la api para eliminar el departamento
+    axios.delete(`${DELETE_DEPARTMENT}/${departmentSelected.code}`);
     const departmentsFiltered = departments.filter(
       (department) => department.code !== departmentSelected.code
     );
@@ -438,7 +451,6 @@ const DepartmentPage = () => {
               <TextInput
                 id="code"
                 name="code"
-                type="number"
                 placeholder="123456"
                 value={departmentSelected && departmentSelected.code}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -512,6 +524,7 @@ const DepartmentPage = () => {
                 <Select
                   id="areaName"
                   name="areaName"
+                  value={departmentSelected && departmentSelected.areaName}
                   required
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                     departmentSelected &&

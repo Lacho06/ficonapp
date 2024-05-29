@@ -1,6 +1,7 @@
 // Tipos del modelo Worker
 
-import { DepartmentName } from "./department";
+import { DepartmentCode } from "./department";
+import { OccupationId } from "./occupation";
 
 export type WorkerCode = number;
 export type WorkerName = string;
@@ -12,14 +13,16 @@ export type Worker = {
   name: WorkerName;
   ci: WorkerCI;
   category: WorkerCategory;
-  department: DepartmentName;
+  departmentCode: DepartmentCode;
+  occupationId: OccupationId;
 };
 
 export type NewWorker = {
   name: WorkerName;
   ci: WorkerCI;
   category: WorkerCategory;
-  department: DepartmentName;
+  departmentCode: DepartmentCode;
+  occupationId: OccupationId;
 };
 
 export type WorkerDetails = {
