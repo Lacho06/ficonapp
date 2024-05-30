@@ -6,6 +6,7 @@ import {
   Label,
   Modal,
   Select,
+  Spinner,
   Table,
   TextInput,
 } from "flowbite-react";
@@ -37,6 +38,7 @@ type ErrorDepartmentFields = {
 };
 
 const DepartmentPage = () => {
+  const [loading, setLoading] = useState<boolean>(true);
   const [areas, setAreas] = useState<Area[]>([]);
 
   const initialNewDepartment: NewDepartment = {
@@ -58,7 +60,10 @@ const DepartmentPage = () => {
 
   useEffect(() => {
     // llamada a la api
-    axios.get(GET_LIST_DEPARTMENTS).then(({ data }) => setDepartments(data));
+    axios.get(GET_LIST_DEPARTMENTS).then(({ data }) => {
+      setDepartments(data);
+      setLoading(false);
+    });
     axios.get(GET_LIST_AREAS).then(({ data }) => setAreas(data));
   }, []);
 
@@ -283,60 +288,66 @@ const DepartmentPage = () => {
             Agregar departamento
           </Button>
         </div>
-        <Table theme={customTheme}>
-          <Table.Head>
-            <Table.HeadCell className="text-center">Código</Table.HeadCell>
-            <Table.HeadCell className="text-center">Nombre</Table.HeadCell>
-            <Table.HeadCell className="text-center">Área</Table.HeadCell>
-            <Table.HeadCell className="text-center">Acciones</Table.HeadCell>
-          </Table.Head>
-          <Table.Body className="divide-y">
-            {departments.length > 0 ? (
-              departments.map((department, i) => {
-                return (
-                  <Table.Row
-                    key={i}
-                    className="bg-white dark:border-gray-700 dark:bg-gray-800"
-                  >
-                    <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
-                      {department.code}
-                    </Table.Cell>
-                    <Table.Cell className="text-center">
-                      {department.name}
-                    </Table.Cell>
-                    <Table.Cell className="text-center">
-                      {department.areaName}
-                    </Table.Cell>
-                    <Table.Cell>
-                      <div className="flex justify-center gap-4">
-                        <button
-                          type="button"
-                          onClick={() => handleEdit(department)}
-                          className="font-medium text-yellow-300 dark:text-yellow-400"
-                        >
-                          Editar
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(department)}
-                          className="font-medium text-red-600 dark:text-cyan-500"
-                        >
-                          Eliminar
-                        </button>
-                      </div>
-                    </Table.Cell>
-                  </Table.Row>
-                );
-              })
-            ) : (
-              <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                <Table.Cell className="text-center bg-gray-50" colSpan={4}>
-                  No hay departamentos disponibles
-                </Table.Cell>
-              </Table.Row>
-            )}
-          </Table.Body>
-        </Table>
+        {loading ? (
+          <div className="flex w-full justify-center py-5">
+            <Spinner color="warning" aria-label="Cargando..." size="lg" />
+          </div>
+        ) : (
+          <Table theme={customTheme}>
+            <Table.Head>
+              <Table.HeadCell className="text-center">Código</Table.HeadCell>
+              <Table.HeadCell className="text-center">Nombre</Table.HeadCell>
+              <Table.HeadCell className="text-center">Área</Table.HeadCell>
+              <Table.HeadCell className="text-center">Acciones</Table.HeadCell>
+            </Table.Head>
+            <Table.Body className="divide-y">
+              {departments.length > 0 ? (
+                departments.map((department, i) => {
+                  return (
+                    <Table.Row
+                      key={i}
+                      className="bg-white dark:border-gray-700 dark:bg-gray-800"
+                    >
+                      <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
+                        {department.code}
+                      </Table.Cell>
+                      <Table.Cell className="text-center">
+                        {department.name}
+                      </Table.Cell>
+                      <Table.Cell className="text-center">
+                        {department.areaName}
+                      </Table.Cell>
+                      <Table.Cell>
+                        <div className="flex justify-center gap-4">
+                          <button
+                            type="button"
+                            onClick={() => handleEdit(department)}
+                            className="font-medium text-yellow-300 dark:text-yellow-400"
+                          >
+                            Editar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(department)}
+                            className="font-medium text-red-600 dark:text-cyan-500"
+                          >
+                            Eliminar
+                          </button>
+                        </div>
+                      </Table.Cell>
+                    </Table.Row>
+                  );
+                })
+              ) : (
+                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                  <Table.Cell className="text-center bg-gray-50" colSpan={4}>
+                    No hay departamentos disponibles
+                  </Table.Cell>
+                </Table.Row>
+              )}
+            </Table.Body>
+          </Table>
+        )}
       </div>
 
       {/* Modal agregar */}

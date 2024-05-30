@@ -5,6 +5,7 @@ import {
   CustomFlowbiteTheme,
   Label,
   Modal,
+  Spinner,
   Table,
   TextInput,
 } from "flowbite-react";
@@ -32,6 +33,7 @@ type ErrorAreaFields = {
 };
 
 const AreaPage = () => {
+  const [loading, setLoading] = useState<boolean>(true);
   const [areas, setAreas] = useState<Area[]>([]);
   const [areaSelected, setAreaSelected] = useState<Area>();
   const [newArea, setNewArea] = useState<NewArea>(initialNewArea);
@@ -43,7 +45,10 @@ const AreaPage = () => {
 
   useEffect(() => {
     // llamada a la api
-    axios.get(GET_LIST_AREAS).then(({ data }) => setAreas(data));
+    axios.get(GET_LIST_AREAS).then(({ data }) => {
+      setAreas(data);
+      setLoading(false);
+    });
   }, []);
 
   const [openModalAdd, setOpenModalAdd] = useState(false);
@@ -186,54 +191,62 @@ const AreaPage = () => {
             Agregar área
           </Button>
         </div>
-        <Table theme={customTheme}>
-          <Table.Head>
-            <Table.HeadCell className="text-center">Código</Table.HeadCell>
-            <Table.HeadCell className="text-center">Nombre</Table.HeadCell>
-            <Table.HeadCell className="text-center">Acciones</Table.HeadCell>
-          </Table.Head>
-          <Table.Body className="divide-y">
-            {areas.length > 0 ? (
-              areas.map((area, i) => {
-                return (
-                  <Table.Row
-                    key={i}
-                    className="bg-white dark:border-gray-700 dark:bg-gray-800"
-                  >
-                    <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
-                      {area.code}
-                    </Table.Cell>
-                    <Table.Cell className="text-center">{area.name}</Table.Cell>
-                    <Table.Cell>
-                      <div className="flex justify-center gap-4">
-                        <button
-                          type="button"
-                          onClick={() => handleEdit(area)}
-                          className="font-medium text-yellow-300 dark:text-yellow-400"
-                        >
-                          Editar
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(area)}
-                          className="font-medium text-red-600 dark:text-cyan-500"
-                        >
-                          Eliminar
-                        </button>
-                      </div>
-                    </Table.Cell>
-                  </Table.Row>
-                );
-              })
-            ) : (
-              <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                <Table.Cell className="text-center bg-gray-50" colSpan={3}>
-                  No hay áreas disponibles
-                </Table.Cell>
-              </Table.Row>
-            )}
-          </Table.Body>
-        </Table>
+        {loading ? (
+          <div className="flex w-full justify-center py-5">
+            <Spinner color="warning" aria-label="Cargando..." size="lg" />
+          </div>
+        ) : (
+          <Table theme={customTheme}>
+            <Table.Head>
+              <Table.HeadCell className="text-center">Código</Table.HeadCell>
+              <Table.HeadCell className="text-center">Nombre</Table.HeadCell>
+              <Table.HeadCell className="text-center">Acciones</Table.HeadCell>
+            </Table.Head>
+            <Table.Body className="divide-y">
+              {areas.length > 0 ? (
+                areas.map((area, i) => {
+                  return (
+                    <Table.Row
+                      key={i}
+                      className="bg-white dark:border-gray-700 dark:bg-gray-800"
+                    >
+                      <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
+                        {area.code}
+                      </Table.Cell>
+                      <Table.Cell className="text-center">
+                        {area.name}
+                      </Table.Cell>
+                      <Table.Cell>
+                        <div className="flex justify-center gap-4">
+                          <button
+                            type="button"
+                            onClick={() => handleEdit(area)}
+                            className="font-medium text-yellow-300 dark:text-yellow-400"
+                          >
+                            Editar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(area)}
+                            className="font-medium text-red-600 dark:text-cyan-500"
+                          >
+                            Eliminar
+                          </button>
+                        </div>
+                      </Table.Cell>
+                    </Table.Row>
+                  );
+                })
+              ) : (
+                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                  <Table.Cell className="text-center bg-gray-50" colSpan={3}>
+                    No hay áreas disponibles
+                  </Table.Cell>
+                </Table.Row>
+              )}
+            </Table.Body>
+          </Table>
+        )}
       </div>
 
       {/* Modal agregar */}

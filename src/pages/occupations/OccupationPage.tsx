@@ -4,6 +4,7 @@ import {
   CustomFlowbiteTheme,
   Label,
   Modal,
+  Spinner,
   Table,
   TextInput,
 } from "flowbite-react";
@@ -38,6 +39,7 @@ type ErrorOccupationFields = {
 };
 
 const OccupationPage = () => {
+  const [loading, setLoading] = useState<boolean>(true);
   const [occupations, setOccupations] = useState<Occupation[]>([]);
   const [occupationSelected, setOccupationSelected] = useState<Occupation>();
   const [newOccupation, setNewOccupation] =
@@ -51,7 +53,10 @@ const OccupationPage = () => {
 
   useEffect(() => {
     // llamada a la api
-    axios.get(GET_LIST_OCCUPATIONS).then(({ data }) => setOccupations(data));
+    axios.get(GET_LIST_OCCUPATIONS).then(({ data }) => {
+      setOccupations(data);
+      setLoading(false);
+    });
   }, []);
 
   const [openModalAdd, setOpenModalAdd] = useState(false);
@@ -246,72 +251,78 @@ const OccupationPage = () => {
             Agregar cargo
           </Button>
         </div>
-        <Table theme={customTheme}>
-          <Table.Head>
-            <Table.HeadCell className="text-center">ID</Table.HeadCell>
-            <Table.HeadCell className="text-center">Nombre</Table.HeadCell>
-            <Table.HeadCell className="text-center">
-              Salario base
-            </Table.HeadCell>
-            <Table.HeadCell className="text-center">Acciones</Table.HeadCell>
-          </Table.Head>
-          <Table.Body className="divide-y">
-            {occupations.length > 0 ? (
-              occupations.map((occupation, i) => {
-                return (
-                  <Table.Row
-                    key={i}
-                    className="bg-white dark:border-gray-700 dark:bg-gray-800"
-                  >
-                    <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
-                      {occupation.id}
-                    </Table.Cell>
-                    <Table.Cell className="text-center">
-                      {occupation.name}
-                    </Table.Cell>
-                    <Table.Cell className="text-center">
-                      {occupation.salary}
-                    </Table.Cell>
-                    <Table.Cell>
-                      <div className="flex justify-center gap-4">
-                        <Link
-                          to={`${ROUTE_OCCUPATION_DETAILS_PREFIX}/${occupation.id}`}
-                        >
+        {loading ? (
+          <div className="flex w-full justify-center py-5">
+            <Spinner color="warning" aria-label="Cargando..." size="lg" />
+          </div>
+        ) : (
+          <Table theme={customTheme}>
+            <Table.Head>
+              <Table.HeadCell className="text-center">ID</Table.HeadCell>
+              <Table.HeadCell className="text-center">Nombre</Table.HeadCell>
+              <Table.HeadCell className="text-center">
+                Salario base
+              </Table.HeadCell>
+              <Table.HeadCell className="text-center">Acciones</Table.HeadCell>
+            </Table.Head>
+            <Table.Body className="divide-y">
+              {occupations.length > 0 ? (
+                occupations.map((occupation, i) => {
+                  return (
+                    <Table.Row
+                      key={i}
+                      className="bg-white dark:border-gray-700 dark:bg-gray-800"
+                    >
+                      <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
+                        {occupation.id}
+                      </Table.Cell>
+                      <Table.Cell className="text-center">
+                        {occupation.name}
+                      </Table.Cell>
+                      <Table.Cell className="text-center">
+                        {occupation.salary}
+                      </Table.Cell>
+                      <Table.Cell>
+                        <div className="flex justify-center gap-4">
+                          <Link
+                            to={`${ROUTE_OCCUPATION_DETAILS_PREFIX}/${occupation.id}`}
+                          >
+                            <button
+                              type="button"
+                              className="font-medium text-cyan-600 dark:text-cyan-500"
+                            >
+                              Ver detalles
+                            </button>
+                          </Link>
                           <button
                             type="button"
-                            className="font-medium text-cyan-600 dark:text-cyan-500"
+                            onClick={() => handleEdit(occupation)}
+                            className="font-medium text-yellow-300 dark:text-yellow-400"
                           >
-                            Ver detalles
+                            Editar
                           </button>
-                        </Link>
-                        <button
-                          type="button"
-                          onClick={() => handleEdit(occupation)}
-                          className="font-medium text-yellow-300 dark:text-yellow-400"
-                        >
-                          Editar
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(occupation)}
-                          className="font-medium text-red-600 dark:text-cyan-500"
-                        >
-                          Eliminar
-                        </button>
-                      </div>
-                    </Table.Cell>
-                  </Table.Row>
-                );
-              })
-            ) : (
-              <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                <Table.Cell className="text-center bg-gray-50" colSpan={4}>
-                  No hay cargos disponibles
-                </Table.Cell>
-              </Table.Row>
-            )}
-          </Table.Body>
-        </Table>
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(occupation)}
+                            className="font-medium text-red-600 dark:text-cyan-500"
+                          >
+                            Eliminar
+                          </button>
+                        </div>
+                      </Table.Cell>
+                    </Table.Row>
+                  );
+                })
+              ) : (
+                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                  <Table.Cell className="text-center bg-gray-50" colSpan={4}>
+                    No hay cargos disponibles
+                  </Table.Cell>
+                </Table.Row>
+              )}
+            </Table.Body>
+          </Table>
+        )}
       </div>
 
       {/* Modal agregar */}
