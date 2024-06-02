@@ -1,4 +1,5 @@
 import {
+  Alert,
   Breadcrumb,
   Button,
   CustomFlowbiteTheme,
@@ -9,6 +10,7 @@ import {
   TextInput,
 } from "flowbite-react";
 import { ERROR_MESSAGES, MONTHS } from "../../constants/app";
+import { HiHome, HiInformationCircle } from "react-icons/hi";
 import { Link, useNavigate } from "react-router-dom";
 import {
   POST_CREATE_PRE_PAYROLL,
@@ -21,11 +23,11 @@ import {
 import {
   ROUTE_HOME_URL,
   ROUTE_PRE_PAYROLL_URL,
+  ROUTE_WORKERS_URL,
 } from "../../constants/routes/routes";
 import { useEffect, useState } from "react";
 
 import { GET_LIST_WORKERS } from "../../constants/endpoints/worker";
-import { HiHome } from "react-icons/hi";
 import { Worker } from "../../constants/types/worker";
 import axios from "axios";
 import { useMiddleware } from "../../hooks/useMiddleware";
@@ -395,22 +397,20 @@ const CreatePrePayrollPage = () => {
         );
 
         setWorkers(
-          workerFiltereds.sort((a: PrePayrollWorker, b: PrePayrollWorker) => {
-            return a.name - b.name;
+          workerFiltereds.sort((a: Worker, b: Worker) => {
+            return a.ci - b.ci;
           })
         );
 
         setWorkersReserved(
-          [...workersReserved, worker].sort(
-            (a: PrePayrollWorker, b: PrePayrollWorker) => {
-              return a.name - b.name;
-            }
-          )
+          [...workersReserved, worker].sort((a: Worker, b: Worker) => {
+            return a.ci - b.ci;
+          })
         );
         setPrePayrollWorkers(
           [...prePayrollWorkers, newPrePayrollWorker].sort(
             (a: PrePayrollWorker, b: PrePayrollWorker) => {
-              return a.name - b.name;
+              return a.ci - b.ci;
             }
           )
         );
@@ -756,6 +756,33 @@ const CreatePrePayrollPage = () => {
             Agregar fila
           </Button>
         </div>
+        {workers.length !== 0 && workersReserved.length === 0 && (
+          <div className="mb-5">
+            <Alert
+              color="warning"
+              icon={HiInformationCircle}
+              rounded
+              withBorderAccent
+            >
+              La prenómina debe tener al menos un trabajador asociado
+            </Alert>
+          </div>
+        )}
+        {workers.length === 0 && (
+          <div className="mb-5">
+            <Alert
+              color="info"
+              icon={HiInformationCircle}
+              rounded
+              withBorderAccent
+            >
+              <span>Primero debe agregar al menos un trabajador </span>
+              <Link to={ROUTE_WORKERS_URL} className="font-bold">
+                Agregar ahora
+              </Link>
+            </Alert>
+          </div>
+        )}
         <div className="overflow-x-auto">
           <Table theme={customTheme}>
             <Table.Head>

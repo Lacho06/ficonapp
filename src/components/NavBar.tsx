@@ -19,7 +19,9 @@ const NavBar = () => {
         </span>
       </Navbar.Brand>
       {user && user.role === "admin" && (
-        <Link to={ROUTE_USERS_URL}>Panel administrativo</Link>
+        <Link to={ROUTE_USERS_URL} className="hover:text-accent-400">
+          Panel administrativo
+        </Link>
       )}
       <div className="flex md:order-2">
         {user && (
@@ -29,7 +31,11 @@ const NavBar = () => {
             label={
               <Avatar
                 alt={`Foto de perfil del usuario ${user.name}`}
-                img="https://github.com/Lacho06.png"
+                img={
+                  user.image && user.image !== ""
+                    ? user.image
+                    : "../../src/assets/icons/user.svg"
+                }
                 rounded
               />
             }
