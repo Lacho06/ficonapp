@@ -111,22 +111,46 @@ const PayrollDetailsPage = () => {
         </div>
         <div className="overflow-x-auto col-span-12">
           {!loading && (
-            <div className="flex flex-col font-bold gap-1 mb-3">
-              <span>GEIC - MINCOM</span>
-              <span>161.0.2652 - SOFTEL</span>
-              <span>890 - SOFTEL</span>
-              <span>
-                34 - Nómina de salario{" "}
-                {`${payrollDetails?.month} ${payrollDetails?.year}`}
-              </span>
-              <span>
-                Período de pago{" "}
-                {`1/${payrollDetails && getNumberMonth(payrollDetails.month)}/${
-                  payrollDetails?.year
-                } al ${payrollDetails && getLimitDay(payrollDetails.month)}/${
-                  payrollDetails && getNumberMonth(payrollDetails.month)
-                }/${payrollDetails?.year}`}
-              </span>
+            <div className="flex justify-between gap-2 mb-3">
+              <div className="flex flex-col font-bold gap-1">
+                <span>GEIC - MINCOM</span>
+                <span>161.0.2652 - SOFTEL</span>
+                <span>890 - SOFTEL</span>
+                <span>
+                  34 - Nómina de salario{" "}
+                  {`${payrollDetails?.month} ${payrollDetails?.year}`}
+                </span>
+                <span>
+                  Período de pago{" "}
+                  {`1/${
+                    payrollDetails && getNumberMonth(payrollDetails.month)
+                  }/${payrollDetails?.year} al ${
+                    payrollDetails && getLimitDay(payrollDetails.month)
+                  }/${payrollDetails && getNumberMonth(payrollDetails.month)}/${
+                    payrollDetails?.year
+                  }`}
+                </span>
+              </div>
+              <div className="flex flex-col gap-1 font-bold">
+                <p>
+                  Elaborada por:{" "}
+                  <span>{payrollDetails && payrollDetails.buildedBy.name}</span>
+                </p>
+                <p>
+                  Revisada por:{" "}
+                  <span>{payrollDetails && payrollDetails.reviewBy.name}</span>
+                </p>
+                <p>
+                  Aprobada por:{" "}
+                  <span>
+                    {payrollDetails && payrollDetails.approvedBy.name}
+                  </span>
+                </p>
+                <p>
+                  Contabilizada por:{" "}
+                  <span>{payrollDetails && payrollDetails.doneBy.name}</span>
+                </p>
+              </div>
             </div>
           )}
           {loading ? (

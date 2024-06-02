@@ -1,4 +1,10 @@
-import { Breadcrumb, Card, CustomFlowbiteTheme, Table } from "flowbite-react";
+import {
+  Breadcrumb,
+  Card,
+  CustomFlowbiteTheme,
+  Spinner,
+  Table,
+} from "flowbite-react";
 import { Link, useParams } from "react-router-dom";
 import {
   ROUTE_HOME_URL,
@@ -17,14 +23,16 @@ import { useMiddleware } from "../../hooks/useMiddleware";
 const OccupationDetailsPage = () => {
   const { id } = useParams();
   const [occupation, setOccupation] = useState<OccupationDetails>();
+  const [loading, setLoading] = useState<boolean>(true);
 
   useMiddleware("rec. humanos");
 
   useEffect(() => {
     // llamada a la api
-    axios
-      .get(`${GET_OCCUPATION_DETAILS}/${id}`)
-      .then(({ data }) => setOccupation(data));
+    axios.get(`${GET_OCCUPATION_DETAILS}/${id}`).then(({ data }) => {
+      setOccupation(data);
+      setLoading(false);
+    });
   }, []);
 
   const customTheme: CustomFlowbiteTheme["table"] = {
@@ -88,67 +96,73 @@ const OccupationDetailsPage = () => {
             </h5>
             <hr className="mb-4" />
             <div className="mx-auto overflow-x-auto w-full">
-              <Table theme={customTheme}>
-                <Table.Head>
-                  <Table.HeadCell className="text-center">
-                    Código
-                  </Table.HeadCell>
-                  <Table.HeadCell className="text-center">
-                    Nombre
-                  </Table.HeadCell>
-                  <Table.HeadCell className="text-center">
-                    Categoría
-                  </Table.HeadCell>
-                  <Table.HeadCell className="text-center">
-                    Acciones
-                  </Table.HeadCell>
-                </Table.Head>
-                <Table.Body className="divide-y">
-                  {occupation && occupation?.workers.length > 0 ? (
-                    occupation?.workers.map((worker, i) => {
-                      return (
-                        <Table.Row
-                          key={i}
-                          className="bg-white dark:border-gray-700 dark:bg-gray-800"
-                        >
-                          <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
-                            {worker.code}
-                          </Table.Cell>
-                          <Table.Cell className="text-center">
-                            {worker.name}
-                          </Table.Cell>
-                          <Table.Cell className="text-center">
-                            {worker.category}
-                          </Table.Cell>
-                          <Table.Cell>
-                            <div className="flex justify-center gap-4">
-                              <Link
-                                to={`${ROUTE_WORKER_DETAILS_PREFIX}/${worker.code}`}
-                              >
-                                <button
-                                  type="button"
-                                  className="font-medium text-cyan-600 dark:text-cyan-500"
+              {loading ? (
+                <div className="flex w-full justify-center py-5">
+                  <Spinner color="warning" aria-label="Cargando..." size="lg" />
+                </div>
+              ) : (
+                <Table theme={customTheme}>
+                  <Table.Head>
+                    <Table.HeadCell className="text-center">
+                      Código
+                    </Table.HeadCell>
+                    <Table.HeadCell className="text-center">
+                      Nombre
+                    </Table.HeadCell>
+                    <Table.HeadCell className="text-center">
+                      Categoría
+                    </Table.HeadCell>
+                    <Table.HeadCell className="text-center">
+                      Acciones
+                    </Table.HeadCell>
+                  </Table.Head>
+                  <Table.Body className="divide-y">
+                    {occupation && occupation?.workers.length > 0 ? (
+                      occupation?.workers.map((worker, i) => {
+                        return (
+                          <Table.Row
+                            key={i}
+                            className="bg-white dark:border-gray-700 dark:bg-gray-800"
+                          >
+                            <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
+                              {worker.code}
+                            </Table.Cell>
+                            <Table.Cell className="text-center">
+                              {worker.name}
+                            </Table.Cell>
+                            <Table.Cell className="text-center">
+                              {worker.category}
+                            </Table.Cell>
+                            <Table.Cell>
+                              <div className="flex justify-center gap-4">
+                                <Link
+                                  to={`${ROUTE_WORKER_DETAILS_PREFIX}/${worker.code}`}
                                 >
-                                  Ver detalles
-                                </button>
-                              </Link>
-                            </div>
-                          </Table.Cell>
-                        </Table.Row>
-                      );
-                    })
-                  ) : (
-                    <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                      <Table.Cell
-                        className="text-center bg-gray-50"
-                        colSpan={4}
-                      >
-                        No hay trabajadores asociados al cargo
-                      </Table.Cell>
-                    </Table.Row>
-                  )}
-                </Table.Body>
-              </Table>
+                                  <button
+                                    type="button"
+                                    className="font-medium text-cyan-600 dark:text-cyan-500"
+                                  >
+                                    Ver detalles
+                                  </button>
+                                </Link>
+                              </div>
+                            </Table.Cell>
+                          </Table.Row>
+                        );
+                      })
+                    ) : (
+                      <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                        <Table.Cell
+                          className="text-center bg-gray-50"
+                          colSpan={4}
+                        >
+                          No hay trabajadores asociados al cargo
+                        </Table.Cell>
+                      </Table.Row>
+                    )}
+                  </Table.Body>
+                </Table>
+              )}
             </div>
           </Card>
         </div>

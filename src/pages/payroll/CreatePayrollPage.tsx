@@ -20,13 +20,16 @@ import {
 } from "../../constants/types/prepayroll";
 import {
   ROUTE_HOME_URL,
+  ROUTE_PAYROLL_DETAILS_URL,
   ROUTE_PAYROLL_URL,
 } from "../../constants/routes/routes";
 import { useEffect, useState } from "react";
 
 import { ERROR_MESSAGES } from "../../constants/app";
+import { GET_LIST_USERS } from "../../constants/endpoints/user";
 import { HiHome } from "react-icons/hi";
 import { POST_CREATE_PAYROLL } from "../../constants/endpoints/payrolls";
+import { User } from "../../constants/types/user";
 import axios from "axios";
 import { toDecimal } from "../../services/app";
 import { useMiddleware } from "../../hooks/useMiddleware";
@@ -41,8 +44,16 @@ type ErrorPayrollEdit = {
   withHoldings: string;
 };
 
+type ErrorPayrollForm = {
+  buildedBy: string;
+  reviewBy: string;
+  approvedBy: string;
+  doneBy: string;
+};
+
 const CreatePayrollPage = () => {
   const navigate = useNavigate();
+  const [users, setUsers] = useState<User[]>([]);
   const [prePayrollSelected, setPrePayrollSelected] =
     useState<PrePayrollBaseWithId>();
   const [prePayrolls, setPrePayrolls] = useState<PrePayrollBaseWithId[]>();
@@ -52,6 +63,12 @@ const CreatePayrollPage = () => {
   const [showTable, setShowTable] = useState(false);
   const [errorPrePayroll, setErrorPrePayroll] = useState<ErrorPrePayroll>({
     prePayrollId: "",
+  });
+  const [errorPayrollForm, setErrorPayrollForm] = useState<ErrorPayrollForm>({
+    buildedBy: "",
+    reviewBy: "",
+    approvedBy: "",
+    doneBy: "",
   });
   const [errorPayroll, setErrorPayroll] = useState<ErrorPayrollEdit>({
     bonus: "",
@@ -64,6 +81,9 @@ const CreatePayrollPage = () => {
   useEffect(() => {
     axios.get(GET_LIST_PRE_PAYROLLS_NOT_ADDED).then(({ data }) => {
       setPrePayrolls(data);
+    });
+    axios.get(GET_LIST_USERS).then(({ data }) => {
+      setUsers(data);
     });
   }, []);
 
@@ -94,15 +114,130 @@ const CreatePayrollPage = () => {
     setPrePayrollSelected(prePayroll);
   };
 
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (!payroll) return;
+
+    const changeUser = users.find(
+      (user) => user.id === Number.parseInt(e.target.value)
+    );
+
+    if (!changeUser) return;
+
+    setPayroll({
+      ...payroll,
+      [e.target.name]: changeUser.id,
+    });
+  };
+
   const handleEdit = (payrollWorker: PayrollWorker) => {
     setPayrollWorkerSelected(payrollWorker);
     setOpenModalEdit(true);
   };
 
+  // ? hasta ahora la nomina trabaja con el id en esos select para enviarlos a la api
+  // ? y debe recibir el User completo para mostrar la vista detalle
+
   const savePayroll = () => {
-    // llamar a la api para guardar los datos
-    axios.post(POST_CREATE_PAYROLL, payroll);
-    navigate(ROUTE_PAYROLL_URL);
+    if (!payroll) return;
+    // validar los datos
+    let newError = {
+      buildedBy: "",
+      reviewBy: "",
+      approvedBy: "",
+      doneBy: "",
+    };
+
+    if (!payroll.buildedBy || payroll.buildedBy <= 0) {
+      newError = {
+        ...newError,
+        buildedBy: ERROR_MESSAGES.EMPTY_FIELD,
+      };
+      setErrorPayrollForm(newError);
+    } else if (users.every((user) => user.id !== payroll.buildedBy)) {
+      newError = {
+        ...newError,
+        buildedBy: ERROR_MESSAGES.INCORRECT_FIELD,
+      };
+      setErrorPayrollForm(newError);
+    } else {
+      newError = {
+        ...newError,
+        buildedBy: "",
+      };
+      setErrorPayrollForm(newError);
+    }
+
+    if (!payroll.reviewBy || payroll.reviewBy <= 0) {
+      newError = {
+        ...newError,
+        reviewBy: ERROR_MESSAGES.EMPTY_FIELD,
+      };
+      setErrorPayrollForm(newError);
+    } else if (users.every((user) => user.id !== payroll.reviewBy)) {
+      newError = {
+        ...newError,
+        reviewBy: ERROR_MESSAGES.INCORRECT_FIELD,
+      };
+      setErrorPayrollForm(newError);
+    } else {
+      newError = {
+        ...newError,
+        reviewBy: "",
+      };
+      setErrorPayrollForm(newError);
+    }
+
+    if (!payroll.approvedBy || payroll.approvedBy <= 0) {
+      newError = {
+        ...newError,
+        approvedBy: ERROR_MESSAGES.EMPTY_FIELD,
+      };
+      setErrorPayrollForm(newError);
+    } else if (users.every((user) => user.id !== payroll.approvedBy)) {
+      newError = {
+        ...newError,
+        approvedBy: ERROR_MESSAGES.INCORRECT_FIELD,
+      };
+      setErrorPayrollForm(newError);
+    } else {
+      newError = {
+        ...newError,
+        approvedBy: "",
+      };
+      setErrorPayrollForm(newError);
+    }
+
+    if (!payroll.doneBy || payroll.doneBy <= 0) {
+      newError = {
+        ...newError,
+        doneBy: ERROR_MESSAGES.EMPTY_FIELD,
+      };
+      setErrorPayrollForm(newError);
+    } else if (users.every((user) => user.id !== payroll.doneBy)) {
+      newError = {
+        ...newError,
+        doneBy: ERROR_MESSAGES.INCORRECT_FIELD,
+      };
+      setErrorPayrollForm(newError);
+    } else {
+      newError = {
+        ...newError,
+        doneBy: "",
+      };
+      setErrorPayrollForm(newError);
+    }
+
+    if (
+      newError.buildedBy === "" &&
+      newError.reviewBy === "" &&
+      newError.approvedBy === "" &&
+      newError.doneBy === ""
+    ) {
+      // llamar a la api para guardar los datos
+      axios.post(POST_CREATE_PAYROLL, payroll).then(({ data }) => {
+        navigate(`${ROUTE_PAYROLL_DETAILS_URL}/${data.id}`);
+      });
+    }
   };
 
   const calcPayroll = (prePayrollWorkers: PrePayrollWorkerTable[]) => {
@@ -158,6 +293,10 @@ const CreatePayrollPage = () => {
     setPayroll({
       month: prePayrollSelected.month,
       year: prePayrollSelected.year,
+      buildedBy: -1,
+      reviewBy: -1,
+      approvedBy: -1,
+      doneBy: -1,
       prePayrollId: prePayrollSelected.id,
       workers: payrollWorkers,
     });
@@ -300,6 +439,132 @@ const CreatePayrollPage = () => {
       </div>
       {showTable ? (
         <div className="overflow-x-auto">
+          <form className="flex gap-4 mb-10">
+            <div>
+              <div className="mb-2 block">
+                <Label htmlFor="buildedBy" value="Elaborada por:" />
+              </div>
+              <Select
+                id="buildedBy"
+                name="buildedBy"
+                value={payroll && payroll.buildedBy}
+                onChange={handleSelectChange}
+                color={errorPayrollForm.buildedBy !== "" ? "failure" : "gray"}
+                helperText={
+                  errorPayrollForm.buildedBy !== "" && (
+                    <>
+                      <span className="font-medium">
+                        {errorPayrollForm.buildedBy}
+                      </span>
+                    </>
+                  )
+                }
+                required
+              >
+                <option value="">Seleccione un usuario</option>
+                {users.map((user, i) => {
+                  return (
+                    <option key={i} value={user.id}>
+                      {user.name}
+                    </option>
+                  );
+                })}
+              </Select>
+            </div>
+            <div>
+              <div className="mb-2 block">
+                <Label htmlFor="reviewBy" value="Revisada por:" />
+              </div>
+              <Select
+                id="reviewBy"
+                name="reviewBy"
+                value={payroll && payroll.reviewBy}
+                onChange={handleSelectChange}
+                color={errorPayrollForm.reviewBy !== "" ? "failure" : "gray"}
+                helperText={
+                  errorPayrollForm.reviewBy !== "" && (
+                    <>
+                      <span className="font-medium">
+                        {errorPayrollForm.reviewBy}
+                      </span>
+                    </>
+                  )
+                }
+                required
+              >
+                <option value="">Seleccione un usuario</option>
+                {users.map((user, i) => {
+                  return (
+                    <option key={i} value={user.id}>
+                      {user.name}
+                    </option>
+                  );
+                })}
+              </Select>
+            </div>
+            <div>
+              <div className="mb-2 block">
+                <Label htmlFor="approvedBy" value="Aprobada por:" />
+              </div>
+              <Select
+                id="approvedBy"
+                name="approvedBy"
+                value={payroll && payroll.approvedBy}
+                onChange={handleSelectChange}
+                color={errorPayrollForm.approvedBy !== "" ? "failure" : "gray"}
+                helperText={
+                  errorPayrollForm.approvedBy !== "" && (
+                    <>
+                      <span className="font-medium">
+                        {errorPayrollForm.approvedBy}
+                      </span>
+                    </>
+                  )
+                }
+                required
+              >
+                <option value="">Seleccione un usuario</option>
+                {users.map((user, i) => {
+                  return (
+                    <option key={i} value={user.id}>
+                      {user.name}
+                    </option>
+                  );
+                })}
+              </Select>
+            </div>
+            <div>
+              <div className="mb-2 block">
+                <Label htmlFor="doneBy" value="Contabilizada por:" />
+              </div>
+              <Select
+                id="doneBy"
+                name="doneBy"
+                value={payroll && payroll.doneBy}
+                onChange={handleSelectChange}
+                color={errorPayrollForm.doneBy !== "" ? "failure" : "gray"}
+                helperText={
+                  errorPayrollForm.doneBy !== "" && (
+                    <>
+                      <span className="font-medium">
+                        {errorPayrollForm.doneBy}
+                      </span>
+                    </>
+                  )
+                }
+                required
+              >
+                <option value="">Seleccione un usuario</option>
+                {users.map((user, i) => {
+                  return (
+                    <option key={i} value={user.id}>
+                      {user.name}
+                    </option>
+                  );
+                })}
+              </Select>
+            </div>
+          </form>
           <Table theme={customTheme}>
             <Table.Head>
               <Table.HeadCell colSpan={14} className="text-center">

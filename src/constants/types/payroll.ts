@@ -1,5 +1,7 @@
 // Tipos del modelo Payroll
 
+import { User, UserId } from "./user";
+
 import { Area } from "./area";
 import { Department } from "./department";
 import { Occupation } from "./occupation";
@@ -12,14 +14,22 @@ export type PayrollYear = number;
 export type PayrollWithoutId = {
   month: PayrollMonth;
   year: PayrollYear;
-  prePayrollId: number;
   workers: PayrollWorker[];
+  buildedBy: UserId;
+  reviewBy: UserId;
+  approvedBy: UserId;
+  doneBy: UserId;
+  prePayrollId: number;
 };
 
 export type Payroll = {
   id: PayrollId;
   month: PayrollMonth;
   year: PayrollYear;
+  buildedBy: User;
+  reviewBy: User;
+  approvedBy: User;
+  doneBy: User;
   workers: PayrollWorker[];
 };
 
@@ -40,6 +50,10 @@ export type PayrollTable = {
   id: PayrollId;
   month: PayrollMonth;
   year: PayrollYear;
+  buildedBy: User;
+  reviewBy: User;
+  approvedBy: User;
+  doneBy: User;
   workers: PayrollWorkerTable[];
 };
 
@@ -63,10 +77,3 @@ export type NewPayrollWorker = {
   prepayrollId: number;
   workerId: number;
 };
-
-// export type OccupationDetails = {
-//   id: OccupationId;
-//   name: OccupationName;
-//   salary: OccupationSalary;
-//   workers: Worker[];
-// };

@@ -27,8 +27,8 @@ LIST TODO:
 ✅ Agregar roles
 ✅ Arreglar la tabla de la nomina y la prenomina
 ✅ Consumir los endpoints
-Agregar loader
+✅ Agregar loader
+Agregar el encabezado de la prenomina y de la nomina
 Arreglar la apariencia del link del navbar
 Agregar los alert
-Agregar el encabezado de la prenomina y de la nomina
 Responsive de todas las vistas
