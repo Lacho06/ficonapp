@@ -5,6 +5,7 @@ import {
   Spinner,
   Table,
 } from "flowbite-react";
+import { HiHome, HiPlus } from "react-icons/hi";
 import {
   ROUTE_CREATE_PAYROLL_URL,
   ROUTE_HOME_URL,
@@ -14,7 +15,6 @@ import {
 import { useEffect, useState } from "react";
 
 import { GET_LIST_PAYROLLS } from "../../constants/endpoints/payrolls";
-import { HiHome } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import { Payroll } from "../../constants/types/payroll";
 import axios from "axios";
@@ -51,8 +51,8 @@ const PayrollPage = () => {
 
   return (
     <>
-      <div className="overflow-x-auto">
-        <div className="flex mt-2 mb-10 p-3 rounded-md bg-gray-50 dark:bg-gray-800 items-center justify-between">
+      <div className="overflow-x-auto w-full py-2">
+        <div className="flex mt-2 mb-5 md:mb-10 p-3 rounded-md bg-gray-50 dark:bg-gray-800 items-center justify-between">
           <Breadcrumb className="mx-4">
             <Breadcrumb.Item icon={HiHome}>
               <Link to={ROUTE_HOME_URL}>Inicio</Link>
@@ -61,9 +61,16 @@ const PayrollPage = () => {
               <Link to={ROUTE_PAYROLL_URL}>Nóminas</Link>
             </Breadcrumb.Item>
           </Breadcrumb>
-          <Button color="success" size="xs" href={ROUTE_CREATE_PAYROLL_URL}>
-            Agregar nómina
-          </Button>
+          <div className="hidden md:block">
+            <Button color="success" size="xs" href={ROUTE_CREATE_PAYROLL_URL}>
+              Agregar nómina
+            </Button>
+          </div>
+          <div className="md:hidden">
+            <Link title="Agregar" to={ROUTE_CREATE_PAYROLL_URL}>
+              <HiPlus />
+            </Link>
+          </div>
         </div>
         {loading ? (
           <div className="flex justify-center w-full">

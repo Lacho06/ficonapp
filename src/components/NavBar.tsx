@@ -1,8 +1,20 @@
 import { Avatar, Dropdown, Navbar } from "flowbite-react";
-import { ROUTE_HOME_URL, ROUTE_USERS_URL } from "../constants/routes/routes";
+import {
+  ROUTE_AREAS_URL,
+  ROUTE_DEPARTMENTS_URL,
+  ROUTE_HOME_URL,
+  ROUTE_OCCUPATIONS_URL,
+  ROUTE_PAYROLL_URL,
+  ROUTE_PRE_PAYROLL_URL,
+  ROUTE_TAX_URL,
+  ROUTE_USERS_URL,
+  ROUTE_WORKERS_URL,
+} from "../constants/routes/routes";
 
 import { APP_NAME } from "../constants/app";
+import { Fragment } from "react/jsx-runtime";
 import { Link } from "react-router-dom";
+import { MdDashboard } from "react-icons/md";
 import { useLogin } from "../hooks/useLogin";
 
 const NavBar = () => {
@@ -19,9 +31,25 @@ const NavBar = () => {
         </span>
       </Navbar.Brand>
       {user && user.role === "admin" && (
-        <Link to={ROUTE_USERS_URL} className="hover:text-accent-400">
-          Panel administrativo
-        </Link>
+        <Fragment>
+          <div className="hidden md:block m-auto">
+            <Link
+              to={ROUTE_USERS_URL}
+              className="text-accent-400 flex items-center gap-2 md:text-white hover:text-accent-400"
+            >
+              <MdDashboard />
+              Panel administrativo
+            </Link>
+          </div>
+          <div className="md:hidden m-auto">
+            <Link
+              to={ROUTE_USERS_URL}
+              className="text-accent-400 md:text-white hover:text-accent-400"
+            >
+              <MdDashboard />
+            </Link>
+          </div>
+        </Fragment>
       )}
       <div className="flex md:order-2">
         {user && (
@@ -49,8 +77,55 @@ const NavBar = () => {
             <Dropdown.Item onClick={() => signOut()}>Sign out</Dropdown.Item>
           </Dropdown>
         )}
-        <Navbar.Toggle className="text-accent-400 hover:text-accent-100" />
+        <Navbar.Toggle className="text-accent-400 hover:text-accent-100 ml-2 md:ml-4" />
       </div>
+      <Navbar.Collapse className="md:hidden">
+        {user && user.role === "admin" && (
+          <Fragment>
+            <Navbar.Link className="text-accent-300" href={ROUTE_USERS_URL}>
+              Usuarios
+            </Navbar.Link>
+          </Fragment>
+        )}
+        {user && user.role === "rec. humanos" && (
+          <Fragment>
+            <Navbar.Link className="text-accent-300" href={ROUTE_WORKERS_URL}>
+              Plantilla
+            </Navbar.Link>
+            <Navbar.Link
+              className="text-accent-300"
+              href={ROUTE_OCCUPATIONS_URL}
+            >
+              Cargos
+            </Navbar.Link>
+            <Navbar.Link
+              className="text-accent-300"
+              href={ROUTE_DEPARTMENTS_URL}
+            >
+              Departamentos
+            </Navbar.Link>
+            <Navbar.Link className="text-accent-300" href={ROUTE_AREAS_URL}>
+              Áreas
+            </Navbar.Link>
+            <Navbar.Link
+              className="text-accent-300"
+              href={ROUTE_PRE_PAYROLL_URL}
+            >
+              Prenómina
+            </Navbar.Link>
+          </Fragment>
+        )}
+        {user && user.role === "economia" && (
+          <Fragment>
+            <Navbar.Link className="text-accent-300" href={ROUTE_TAX_URL}>
+              Impuestos
+            </Navbar.Link>
+            <Navbar.Link className="text-accent-300" href={ROUTE_PAYROLL_URL}>
+              Nómina
+            </Navbar.Link>
+          </Fragment>
+        )}
+      </Navbar.Collapse>
     </Navbar>
   );
 };

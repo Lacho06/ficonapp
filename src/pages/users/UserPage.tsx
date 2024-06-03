@@ -16,12 +16,12 @@ import {
   POST_CREATE_USER,
   PUT_UPDATE_USER,
 } from "../../constants/endpoints/user";
+import { HiHome, HiPlus } from "react-icons/hi";
 import { NewUser, User } from "../../constants/types/user";
 import { ROUTE_HOME_URL, ROUTE_USERS_URL } from "../../constants/routes/routes";
 import { useEffect, useState } from "react";
 
 import { ERROR_MESSAGES } from "../../constants/app";
-import { HiHome } from "react-icons/hi";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -294,75 +294,84 @@ const UserPage = () => {
               <Link to={ROUTE_USERS_URL}>Usuarios</Link>
             </Breadcrumb.Item>
           </Breadcrumb>
-          <Button
-            color="success"
-            size="xs"
-            onClick={() => setOpenModalAdd(true)}
-          >
-            Agregar usuario
-          </Button>
+          <div className="hidden md:block">
+            <Button
+              color="success"
+              size="xs"
+              onClick={() => setOpenModalAdd(true)}
+            >
+              Agregar usuario
+            </Button>
+          </div>
+          <div className="md:hidden">
+            <HiPlus onClick={() => setOpenModalAdd(true)} />
+          </div>
         </div>
         {loading ? (
           <div className="flex w-full justify-center py-5">
             <Spinner color="warning" aria-label="Cargando..." size="lg" />
           </div>
         ) : (
-          <Table theme={customTheme}>
-            <Table.Head>
-              <Table.HeadCell className="text-center">ID</Table.HeadCell>
-              <Table.HeadCell className="text-center">Nombre</Table.HeadCell>
-              <Table.HeadCell className="text-center">
-                Correo electrónico
-              </Table.HeadCell>
-              <Table.HeadCell className="text-center">Acciones</Table.HeadCell>
-            </Table.Head>
-            <Table.Body className="divide-y">
-              {users.length > 0 ? (
-                users.map((user, i) => {
-                  return (
-                    <Table.Row
-                      key={i}
-                      className="bg-white dark:border-gray-700 dark:bg-gray-800"
-                    >
-                      <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
-                        {user.id}
-                      </Table.Cell>
-                      <Table.Cell className="text-center font-medium">
-                        {user.name}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {user.email}
-                      </Table.Cell>
-                      <Table.Cell>
-                        <div className="flex justify-center gap-4">
-                          <button
-                            type="button"
-                            onClick={() => handleEdit(user)}
-                            className="font-medium text-yellow-300 dark:text-yellow-400"
-                          >
-                            Editar
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDelete(user)}
-                            className="font-medium text-red-600 dark:text-cyan-500"
-                          >
-                            Eliminar
-                          </button>
-                        </div>
-                      </Table.Cell>
-                    </Table.Row>
-                  );
-                })
-              ) : (
-                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                  <Table.Cell className="text-center bg-gray-50" colSpan={4}>
-                    No hay usuarios disponibles
-                  </Table.Cell>
-                </Table.Row>
-              )}
-            </Table.Body>
-          </Table>
+          <div className="w-full overflow-x-auto">
+            <Table theme={customTheme}>
+              <Table.Head>
+                <Table.HeadCell className="text-center">ID</Table.HeadCell>
+                <Table.HeadCell className="text-center">Nombre</Table.HeadCell>
+                <Table.HeadCell className="text-center">
+                  Correo electrónico
+                </Table.HeadCell>
+                <Table.HeadCell className="text-center">
+                  Acciones
+                </Table.HeadCell>
+              </Table.Head>
+              <Table.Body className="divide-y">
+                {users.length > 0 ? (
+                  users.map((user, i) => {
+                    return (
+                      <Table.Row
+                        key={i}
+                        className="bg-white dark:border-gray-700 dark:bg-gray-800"
+                      >
+                        <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
+                          {user.id}
+                        </Table.Cell>
+                        <Table.Cell className="text-center font-medium">
+                          {user.name}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {user.email}
+                        </Table.Cell>
+                        <Table.Cell>
+                          <div className="flex justify-center gap-4">
+                            <button
+                              type="button"
+                              onClick={() => handleEdit(user)}
+                              className="font-medium text-yellow-300 dark:text-yellow-400"
+                            >
+                              Editar
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDelete(user)}
+                              className="font-medium text-red-600 dark:text-cyan-500"
+                            >
+                              Eliminar
+                            </button>
+                          </div>
+                        </Table.Cell>
+                      </Table.Row>
+                    );
+                  })
+                ) : (
+                  <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                    <Table.Cell className="text-center bg-gray-50" colSpan={4}>
+                      No hay usuarios disponibles
+                    </Table.Cell>
+                  </Table.Row>
+                )}
+              </Table.Body>
+            </Table>
+          </div>
         )}
       </div>
 

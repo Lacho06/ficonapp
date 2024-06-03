@@ -32,3 +32,4 @@ LIST TODO:
 ✅ Arreglar la apariencia del link del navbar
 ✅ Agregar los alert
 Responsive de todas las vistas
+Arreglar el calculo de los impuestos

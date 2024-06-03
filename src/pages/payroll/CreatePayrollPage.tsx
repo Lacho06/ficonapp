@@ -20,12 +20,13 @@ import {
 } from "../../constants/types/prepayroll";
 import {
   ROUTE_HOME_URL,
-  ROUTE_PAYROLL_DETAILS_URL,
+  ROUTE_PAYROLL_DETAILS_PREFIX,
   ROUTE_PAYROLL_URL,
 } from "../../constants/routes/routes";
 import { useEffect, useState } from "react";
 
 import { ERROR_MESSAGES } from "../../constants/app";
+import { FaSave } from "react-icons/fa";
 import { GET_LIST_USERS } from "../../constants/endpoints/user";
 import { HiHome } from "react-icons/hi";
 import { POST_CREATE_PAYROLL } from "../../constants/endpoints/payrolls";
@@ -134,9 +135,6 @@ const CreatePayrollPage = () => {
     setOpenModalEdit(true);
   };
 
-  // ? hasta ahora la nomina trabaja con el id en esos select para enviarlos a la api
-  // ? y debe recibir el User completo para mostrar la vista detalle
-
   const savePayroll = () => {
     if (!payroll) return;
     // validar los datos
@@ -235,7 +233,7 @@ const CreatePayrollPage = () => {
     ) {
       // llamar a la api para guardar los datos
       axios.post(POST_CREATE_PAYROLL, payroll).then(({ data }) => {
-        navigate(`${ROUTE_PAYROLL_DETAILS_URL}/${data.id}`);
+        navigate(`${ROUTE_PAYROLL_DETAILS_PREFIX}/${data.id}`);
       });
     }
   };
@@ -433,13 +431,18 @@ const CreatePayrollPage = () => {
             <Link to={ROUTE_PAYROLL_URL}>Nóminas</Link>
           </Breadcrumb.Item>
         </Breadcrumb>
-        <Button color="success" size="xs" onClick={savePayroll}>
-          Guardar nómina
-        </Button>
+        <div className="hidden md:block">
+          <Button color="success" size="xs" onClick={savePayroll}>
+            Guardar nómina
+          </Button>
+        </div>
+        <div className="md:hidden">
+          <FaSave onClick={savePayroll} />
+        </div>
       </div>
       {showTable ? (
-        <div className="overflow-x-auto">
-          <form className="flex gap-4 mb-10">
+        <div className="overflow-x-auto pb-4">
+          <form className="flex flex-col md:flex-row gap-4 mb-10">
             <div>
               <div className="mb-2 block">
                 <Label htmlFor="buildedBy" value="Elaborada por:" />
@@ -565,107 +568,113 @@ const CreatePayrollPage = () => {
               </Select>
             </div>
           </form>
-          <Table theme={customTheme}>
-            <Table.Head>
-              <Table.HeadCell colSpan={14} className="text-center">
-                Nómina{" "}
-                {`${prePayrollSelected?.month.toUpperCase()} de ${
-                  prePayrollSelected?.year
-                }`}
-              </Table.HeadCell>
-            </Table.Head>
-            <Table.Head>
-              <Table.HeadCell className="text-center">Código</Table.HeadCell>
-              <Table.HeadCell className="text-center">
-                Nombres y apellidos
-              </Table.HeadCell>
-              <Table.HeadCell className="text-center">C.I.</Table.HeadCell>
-              <Table.HeadCell className="text-center">
-                Cat. Ocup.
-              </Table.HeadCell>
-              <Table.HeadCell className="text-center">
-                Tarf. Sal.
-              </Table.HeadCell>
-              <Table.HeadCell className="text-center">Horas</Table.HeadCell>
-              <Table.HeadCell className="text-center">A cobrar</Table.HeadCell>
-              <Table.HeadCell className="text-center">Bon.</Table.HeadCell>
-              <Table.HeadCell className="text-center">P.A.T.</Table.HeadCell>
-              <Table.HeadCell className="text-center">Deven.</Table.HeadCell>
-              <Table.HeadCell className="text-center">Imp. S.</Table.HeadCell>
-              <Table.HeadCell className="text-center">Ret.</Table.HeadCell>
-              <Table.HeadCell className="text-center">Pagado</Table.HeadCell>
-              <Table.HeadCell className="text-center">Acciones</Table.HeadCell>
-            </Table.Head>
-            <Table.Body className="divide-y">
-              {payroll && payroll.workers.length > 0 ? (
-                payroll.workers.map((payrollWorker, i) => {
-                  return (
-                    <Table.Row
-                      key={i}
-                      className="bg-white dark:border-gray-700 dark:bg-gray-800"
-                    >
-                      <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
-                        {payrollWorker.worker.code}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {payrollWorker.worker.name}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {payrollWorker.worker.ci}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {payrollWorker.worker.category}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {payrollWorker.salaryRate}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {payrollWorker.hours}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {payrollWorker.toCollect}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {payrollWorker.bonus}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {payrollWorker.pat}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {payrollWorker.earnedSalary}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {payrollWorker.salaryTax}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {payrollWorker.withHoldings}
-                      </Table.Cell>
-                      <Table.Cell className="text-center font-bold">
-                        {payrollWorker.paid}
-                      </Table.Cell>
-                      <Table.Cell>
-                        <div className="flex justify-center gap-4">
-                          <button
-                            type="button"
-                            onClick={() => handleEdit(payrollWorker)}
-                            className="font-medium text-yellow-300 dark:text-yellow-400"
-                          >
-                            Editar
-                          </button>
-                        </div>
-                      </Table.Cell>
-                    </Table.Row>
-                  );
-                })
-              ) : (
-                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                  <Table.Cell className="text-center bg-gray-50" colSpan={14}>
-                    No hay nóminas disponibles
-                  </Table.Cell>
-                </Table.Row>
-              )}
-            </Table.Body>
-          </Table>
+          <div className="w-full overflow-auto">
+            <Table theme={customTheme}>
+              <Table.Head>
+                <Table.HeadCell colSpan={14} className="text-center">
+                  Nómina{" "}
+                  {`${prePayrollSelected?.month.toUpperCase()} de ${
+                    prePayrollSelected?.year
+                  }`}
+                </Table.HeadCell>
+              </Table.Head>
+              <Table.Head>
+                <Table.HeadCell className="text-center">Código</Table.HeadCell>
+                <Table.HeadCell className="text-center">
+                  Nombres y apellidos
+                </Table.HeadCell>
+                <Table.HeadCell className="text-center">C.I.</Table.HeadCell>
+                <Table.HeadCell className="text-center">
+                  Cat. Ocup.
+                </Table.HeadCell>
+                <Table.HeadCell className="text-center">
+                  Tarf. Sal.
+                </Table.HeadCell>
+                <Table.HeadCell className="text-center">Horas</Table.HeadCell>
+                <Table.HeadCell className="text-center">
+                  A cobrar
+                </Table.HeadCell>
+                <Table.HeadCell className="text-center">Bon.</Table.HeadCell>
+                <Table.HeadCell className="text-center">P.A.T.</Table.HeadCell>
+                <Table.HeadCell className="text-center">Deven.</Table.HeadCell>
+                <Table.HeadCell className="text-center">Imp. S.</Table.HeadCell>
+                <Table.HeadCell className="text-center">Ret.</Table.HeadCell>
+                <Table.HeadCell className="text-center">Pagado</Table.HeadCell>
+                <Table.HeadCell className="text-center">
+                  Acciones
+                </Table.HeadCell>
+              </Table.Head>
+              <Table.Body className="divide-y">
+                {payroll && payroll.workers.length > 0 ? (
+                  payroll.workers.map((payrollWorker, i) => {
+                    return (
+                      <Table.Row
+                        key={i}
+                        className="bg-white dark:border-gray-700 dark:bg-gray-800"
+                      >
+                        <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
+                          {payrollWorker.worker.code}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {payrollWorker.worker.name}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {payrollWorker.worker.ci}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {payrollWorker.worker.category}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {payrollWorker.salaryRate}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {payrollWorker.hours}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {payrollWorker.toCollect}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {payrollWorker.bonus}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {payrollWorker.pat}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {payrollWorker.earnedSalary}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {payrollWorker.salaryTax}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {payrollWorker.withHoldings}
+                        </Table.Cell>
+                        <Table.Cell className="text-center font-bold">
+                          {payrollWorker.paid}
+                        </Table.Cell>
+                        <Table.Cell>
+                          <div className="flex justify-center gap-4">
+                            <button
+                              type="button"
+                              onClick={() => handleEdit(payrollWorker)}
+                              className="font-medium text-yellow-300 dark:text-yellow-400"
+                            >
+                              Editar
+                            </button>
+                          </div>
+                        </Table.Cell>
+                      </Table.Row>
+                    );
+                  })
+                ) : (
+                  <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                    <Table.Cell className="text-center bg-gray-50" colSpan={14}>
+                      No hay nóminas disponibles
+                    </Table.Cell>
+                  </Table.Row>
+                )}
+              </Table.Body>
+            </Table>
+          </div>
         </div>
       ) : (
         <form className="flex gap-4">

@@ -6,11 +6,11 @@ const DashboardLayout = () => {
   return (
     <div className="min-h-screen">
       <NavBar></NavBar>
-      <div className="grid grid-cols-12 gap-4 w-full">
-        <div className="col-span-2">
+      <div className="grid grid-cols-12 w-full">
+        <div className="hidden lg:block lg:col-span-2">
           <SideBar></SideBar>
         </div>
-        <div className="p-4 col-span-10">
+        <div className="p-1 sm:p-2 md:p-4 col-span-12 lg:col-span-10">
           <Outlet></Outlet>
         </div>
       </div>

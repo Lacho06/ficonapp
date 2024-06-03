@@ -68,7 +68,7 @@ const OccupationDetailsPage = () => {
         </Breadcrumb>
       </div>
 
-      <div className="flex justify-between gap-8">
+      <div className="flex flex-col md:flex-row md:justify-between gap-8">
         <div className="w-full">
           <Card className="flex flex-col">
             <h5 className="mx-auto text-2xl font-bold tracking-tight text-gray-900 dark:text-white">

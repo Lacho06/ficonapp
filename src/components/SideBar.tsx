@@ -19,10 +19,10 @@ const SideBar = () => {
   const customTheme: CustomFlowbiteTheme["sidebar"] = {
     root: {
       inner:
-        "fixed top-0 left-0 bottom-0 overflow-y-auto overflow-x-hidden rounded px-3 pt-20 pb-4 bg-accent-500 dark:bg-gray-800",
+        "fixed top-0 left-0 bottom-0 overflow-y-auto overflow-x-hidden rounded xl:px-3 pt-20 pb-4 bg-accent-500 dark:bg-gray-800",
     },
     item: {
-      base: "flex items-center justify-center rounded-lg p-2 text-base font-normal text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 cursor-pointer",
+      base: "flex items-center justify-center rounded-lg py-2 px-1 xl:px-2 text-base font-normal text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 cursor-pointer",
     },
   };
 

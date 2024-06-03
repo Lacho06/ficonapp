@@ -10,7 +10,7 @@ import {
   TextInput,
 } from "flowbite-react";
 import { ERROR_MESSAGES, MONTHS } from "../../constants/app";
-import { HiHome, HiInformationCircle } from "react-icons/hi";
+import { HiHome, HiInformationCircle, HiPlus } from "react-icons/hi";
 import { Link, useNavigate } from "react-router-dom";
 import {
   POST_CREATE_PRE_PAYROLL,
@@ -748,13 +748,18 @@ const CreatePrePayrollPage = () => {
               <Link to={ROUTE_PRE_PAYROLL_URL}>Prenóminas</Link>
             </Breadcrumb.Item>
           </Breadcrumb>
-          <Button
-            color="success"
-            size="xs"
-            onClick={() => setOpenModalAdd(true)}
-          >
-            Agregar fila
-          </Button>
+          <div className="hidden md:block">
+            <Button
+              color="success"
+              size="xs"
+              onClick={() => setOpenModalAdd(true)}
+            >
+              Agregar fila
+            </Button>
+          </div>
+          <div className="md:hidden">
+            <HiPlus onClick={() => setOpenModalAdd(true)} />
+          </div>
         </div>
         {workers.length !== 0 && workersReserved.length === 0 && (
           <div className="mb-5">
@@ -783,7 +788,7 @@ const CreatePrePayrollPage = () => {
             </Alert>
           </div>
         )}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto w-full">
           <Table theme={customTheme}>
             <Table.Head>
               <Table.HeadCell colSpan={13} className="text-center">
@@ -880,14 +885,14 @@ const CreatePrePayrollPage = () => {
               ) : (
                 <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
                   <Table.Cell className="text-center bg-gray-50" colSpan={13}>
-                    No hay prenóminas disponibles
+                    No hay trabajadores asociados a la prenómina
                   </Table.Cell>
                 </Table.Row>
               )}
             </Table.Body>
           </Table>
         </div>
-        <form className="flex gap-4 mt-20">
+        <form className="flex items-end gap-4 mt-20 mb-4">
           <div>
             <div className="mb-2 block">
               <Label htmlFor="month" value="Seleccione el mes" />
@@ -998,7 +1003,7 @@ const CreatePrePayrollPage = () => {
                 })}
               </Select>
             </div>
-            <div className="flex gap-8">
+            <div className="flex gap-8 items-end">
               <div className="w-full">
                 <div className="mb-2">
                   <Label htmlFor="hTrab" value="Horas trabajadas" />
@@ -1076,7 +1081,7 @@ const CreatePrePayrollPage = () => {
                 />
               </div>
             </div>
-            <div className="flex gap-8">
+            <div className="flex gap-8 items-end">
               <div className="w-full">
                 <div className="mb-2">
                   <Label htmlFor="impunt" value="Impunt." />
@@ -1154,7 +1159,7 @@ const CreatePrePayrollPage = () => {
                 />
               </div>
             </div>
-            <div className="flex gap-8">
+            <div className="flex gap-8 items-end">
               <div className="w-full">
                 <div className="mb-2">
                   <Label htmlFor="hrsCertif" value="Hrs. certif." />
@@ -1235,7 +1240,7 @@ const CreatePrePayrollPage = () => {
                 />
               </div>
             </div>
-            <div className="flex gap-8">
+            <div className="flex gap-8 items-end">
               <div className="w-full">
                 <div className="mb-2">
                   <Label htmlFor="hrsResol" value="Hrs. resol." />
@@ -1313,7 +1318,7 @@ const CreatePrePayrollPage = () => {
                 />
               </div>
             </div>
-            <div className="flex gap-8">
+            <div className="flex gap-8 items-end">
               <div className="w-full">
                 <div className="mb-2">
                   <Label htmlFor="otroTpoPagar" value="Otro tpo a pagar" />
@@ -1503,7 +1508,7 @@ const CreatePrePayrollPage = () => {
                 />
               </div>
             </div>
-            <div className="flex gap-8">
+            <div className="flex gap-8 items-end">
               <div className="w-full">
                 <div className="mb-2">
                   <Label htmlFor="impunt" value="Impunt." />
@@ -1589,7 +1594,7 @@ const CreatePrePayrollPage = () => {
                 />
               </div>
             </div>
-            <div className="flex gap-8">
+            <div className="flex gap-8 items-end">
               <div className="w-full">
                 <div className="mb-2">
                   <Label htmlFor="hrsCertif" value="Hrs. certif." />
@@ -1677,7 +1682,7 @@ const CreatePrePayrollPage = () => {
                 />
               </div>
             </div>
-            <div className="flex gap-8">
+            <div className="flex gap-8 items-end">
               <div className="w-full">
                 <div className="mb-2">
                   <Label htmlFor="hrsResol" value="Hrs. resol." />
@@ -1763,7 +1768,7 @@ const CreatePrePayrollPage = () => {
                 />
               </div>
             </div>
-            <div className="flex gap-8">
+            <div className="flex gap-8 items-end">
               <div className="w-full">
                 <div className="mb-2">
                   <Label htmlFor="otroTpoPagar" value="Otro tpo a pagar" />

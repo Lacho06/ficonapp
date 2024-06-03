@@ -15,7 +15,7 @@ import {
   POST_CREATE_TAX,
   PUT_UPDATE_TAX,
 } from "../../constants/endpoints/tax";
-import { HiHome, HiOutlineExclamationCircle } from "react-icons/hi";
+import { HiHome, HiOutlineExclamationCircle, HiPlus } from "react-icons/hi";
 import { NewTax, Tax } from "../../constants/types/tax";
 import { ROUTE_HOME_URL, ROUTE_TAX_URL } from "../../constants/routes/routes";
 import { useEffect, useState } from "react";
@@ -397,145 +397,160 @@ const TaxPage = () => {
               <Link to={ROUTE_TAX_URL}>Impuestos</Link>
             </Breadcrumb.Item>
           </Breadcrumb>
-          <Button
-            color="success"
-            size="xs"
-            onClick={() => setOpenModalAdd(true)}
-          >
-            Agregar impuesto
-          </Button>
+          <div className="hidden md:block">
+            <Button
+              color="success"
+              size="xs"
+              onClick={() => setOpenModalAdd(true)}
+            >
+              Agregar impuesto
+            </Button>
+          </div>
+          <div className="md:hidden">
+            <HiPlus onClick={() => setOpenModalAdd(true)} />
+          </div>
         </div>
         <div
-          className={`flex gap-8 w-full ${
+          className={`flex flex-col md:flex-row gap-8 w-full ${
             loading ? "justify-center py-10" : "justify-between"
           }`}
         >
           {loading ? (
-            <Spinner color="warning" aria-label="Cargando..." size="lg" />
+            <div className="flex justify-center w-full">
+              <Spinner color="warning" aria-label="Cargando..." size="lg" />
+            </div>
           ) : (
             <>
-              <Table theme={customTheme}>
-                <Table.Head>
-                  <Table.HeadCell colSpan={3} className="text-center">
-                    Impuestos sobre seguridad social
-                  </Table.HeadCell>
-                </Table.Head>
-                <Table.Head>
-                  <Table.HeadCell className="text-center">Rango</Table.HeadCell>
-                  <Table.HeadCell className="text-center">
-                    Porciento
-                  </Table.HeadCell>
-                  <Table.HeadCell className="text-center">
-                    Acciones
-                  </Table.HeadCell>
-                </Table.Head>
-                <Table.Body className="divide-y">
-                  {segTaxs.length > 0 ? (
-                    segTaxs.map((segTax, i) => {
-                      return (
-                        <Table.Row
-                          key={i}
-                          className="bg-white dark:border-gray-700 dark:bg-gray-800"
-                        >
-                          <Table.Cell className="text-center font-medium">
-                            {segTax.minValue} - {segTax.maxValue}
-                          </Table.Cell>
-                          <Table.Cell className="text-center">
-                            {segTax.percentage}
-                          </Table.Cell>
-                          <Table.Cell className="flex justify-center gap-4">
-                            <button
-                              type="button"
-                              onClick={() => handleEdit(segTax)}
-                              className="font-medium text-yellow-300 dark:text-yellow-400"
-                            >
-                              Editar
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDelete(segTax)}
-                              className="font-medium text-red-600 dark:text-cyan-500"
-                            >
-                              Eliminar
-                            </button>
-                          </Table.Cell>
-                        </Table.Row>
-                      );
-                    })
-                  ) : (
-                    <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                      <Table.Cell
-                        className="text-center bg-gray-50"
-                        colSpan={3}
-                      >
-                        No hay impuestos disponibles
-                      </Table.Cell>
-                    </Table.Row>
-                  )}
-                </Table.Body>
-              </Table>
-              <Table theme={customTheme}>
-                <Table.Head>
-                  <Table.HeadCell colSpan={3} className="text-center">
-                    Impuestos sobre ingresos personales
-                  </Table.HeadCell>
-                </Table.Head>
-                <Table.Head>
-                  <Table.HeadCell className="text-center">Rango</Table.HeadCell>
-                  <Table.HeadCell className="text-center">
-                    Porciento
-                  </Table.HeadCell>
-                  <Table.HeadCell className="text-center">
-                    Acciones
-                  </Table.HeadCell>
-                </Table.Head>
-                <Table.Body className="divide-y">
-                  {ingTaxs.length > 0 ? (
-                    ingTaxs.map((ingTax, i) => {
-                      return (
-                        <Table.Row
-                          key={i}
-                          className="bg-white dark:border-gray-700 dark:bg-gray-800"
-                        >
-                          <Table.Cell className="text-center font-medium">
-                            {ingTax.minValue} - {ingTax.maxValue}
-                          </Table.Cell>
-                          <Table.Cell className="text-center">
-                            {ingTax.percentage}
-                          </Table.Cell>
-                          <Table.Cell>
-                            <div className="flex justify-center gap-4">
+              <div className="w-full overflow-x-auto">
+                <Table theme={customTheme}>
+                  <Table.Head>
+                    <Table.HeadCell colSpan={3} className="text-center">
+                      Impuestos sobre seguridad social
+                    </Table.HeadCell>
+                  </Table.Head>
+                  <Table.Head>
+                    <Table.HeadCell className="text-center">
+                      Rango
+                    </Table.HeadCell>
+                    <Table.HeadCell className="text-center">
+                      Porciento
+                    </Table.HeadCell>
+                    <Table.HeadCell className="text-center">
+                      Acciones
+                    </Table.HeadCell>
+                  </Table.Head>
+                  <Table.Body className="divide-y">
+                    {segTaxs.length > 0 ? (
+                      segTaxs.map((segTax, i) => {
+                        return (
+                          <Table.Row
+                            key={i}
+                            className="bg-white dark:border-gray-700 dark:bg-gray-800"
+                          >
+                            <Table.Cell className="text-center font-medium">
+                              {segTax.minValue} - {segTax.maxValue}
+                            </Table.Cell>
+                            <Table.Cell className="text-center">
+                              {segTax.percentage}
+                            </Table.Cell>
+                            <Table.Cell className="flex justify-center gap-4">
                               <button
                                 type="button"
-                                onClick={() => handleEdit(ingTax)}
+                                onClick={() => handleEdit(segTax)}
                                 className="font-medium text-yellow-300 dark:text-yellow-400"
                               >
                                 Editar
                               </button>
                               <button
                                 type="button"
-                                onClick={() => handleDelete(ingTax)}
+                                onClick={() => handleDelete(segTax)}
                                 className="font-medium text-red-600 dark:text-cyan-500"
                               >
                                 Eliminar
                               </button>
-                            </div>
-                          </Table.Cell>
-                        </Table.Row>
-                      );
-                    })
-                  ) : (
-                    <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                      <Table.Cell
-                        className="text-center bg-gray-50"
-                        colSpan={3}
-                      >
-                        No hay impuestos disponibles
-                      </Table.Cell>
-                    </Table.Row>
-                  )}
-                </Table.Body>
-              </Table>
+                            </Table.Cell>
+                          </Table.Row>
+                        );
+                      })
+                    ) : (
+                      <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                        <Table.Cell
+                          className="text-center bg-gray-50"
+                          colSpan={3}
+                        >
+                          No hay impuestos disponibles
+                        </Table.Cell>
+                      </Table.Row>
+                    )}
+                  </Table.Body>
+                </Table>
+              </div>
+              <div className="w-full overflow-x-auto">
+                <Table theme={customTheme}>
+                  <Table.Head>
+                    <Table.HeadCell colSpan={3} className="text-center">
+                      Impuestos sobre ingresos personales
+                    </Table.HeadCell>
+                  </Table.Head>
+                  <Table.Head>
+                    <Table.HeadCell className="text-center">
+                      Rango
+                    </Table.HeadCell>
+                    <Table.HeadCell className="text-center">
+                      Porciento
+                    </Table.HeadCell>
+                    <Table.HeadCell className="text-center">
+                      Acciones
+                    </Table.HeadCell>
+                  </Table.Head>
+                  <Table.Body className="divide-y">
+                    {ingTaxs.length > 0 ? (
+                      ingTaxs.map((ingTax, i) => {
+                        return (
+                          <Table.Row
+                            key={i}
+                            className="bg-white dark:border-gray-700 dark:bg-gray-800"
+                          >
+                            <Table.Cell className="text-center font-medium">
+                              {ingTax.minValue} - {ingTax.maxValue}
+                            </Table.Cell>
+                            <Table.Cell className="text-center">
+                              {ingTax.percentage}
+                            </Table.Cell>
+                            <Table.Cell>
+                              <div className="flex justify-center gap-4">
+                                <button
+                                  type="button"
+                                  onClick={() => handleEdit(ingTax)}
+                                  className="font-medium text-yellow-300 dark:text-yellow-400"
+                                >
+                                  Editar
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDelete(ingTax)}
+                                  className="font-medium text-red-600 dark:text-cyan-500"
+                                >
+                                  Eliminar
+                                </button>
+                              </div>
+                            </Table.Cell>
+                          </Table.Row>
+                        );
+                      })
+                    ) : (
+                      <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                        <Table.Cell
+                          className="text-center bg-gray-50"
+                          colSpan={3}
+                        >
+                          No hay impuestos disponibles
+                        </Table.Cell>
+                      </Table.Row>
+                    )}
+                  </Table.Body>
+                </Table>
+              </div>
             </>
           )}
         </div>

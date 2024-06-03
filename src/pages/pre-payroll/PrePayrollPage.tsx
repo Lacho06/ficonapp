@@ -5,6 +5,7 @@ import {
   Spinner,
   Table,
 } from "flowbite-react";
+import { HiHome, HiPlus } from "react-icons/hi";
 import {
   ROUTE_CREATE_PRE_PAYROLL_URL,
   ROUTE_HOME_URL,
@@ -14,7 +15,6 @@ import {
 import { useEffect, useState } from "react";
 
 import { GET_LIST_PRE_PAYROLLS } from "./../../constants/endpoints/prepayroll";
-import { HiHome } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import { PrePayroll } from "../../constants/types/prepayroll";
 import axios from "axios";
@@ -61,61 +61,78 @@ const PrePayrollPage = () => {
               <Link to={ROUTE_PRE_PAYROLL_URL}>Prenóminas</Link>
             </Breadcrumb.Item>
           </Breadcrumb>
-          <Button color="success" size="xs" href={ROUTE_CREATE_PRE_PAYROLL_URL}>
-            Agregar prenómina
-          </Button>
+          <div className="hidden md:block">
+            <Button
+              color="success"
+              size="xs"
+              href={ROUTE_CREATE_PRE_PAYROLL_URL}
+            >
+              Agregar prenómina
+            </Button>
+          </div>
+          <div className="md:hidden">
+            <Link to={ROUTE_CREATE_PRE_PAYROLL_URL}>
+              <HiPlus />
+            </Link>
+          </div>
         </div>
         {loading ? (
           <div className="flex w-full justify-center py-5">
             <Spinner color="warning" aria-label="Cargando..." size="lg" />
           </div>
         ) : (
-          <Table theme={customTheme}>
-            <Table.Head>
-              <Table.HeadCell className="text-center">ID</Table.HeadCell>
-              <Table.HeadCell className="text-center">Mes / Año</Table.HeadCell>
-              <Table.HeadCell className="text-center">Acciones</Table.HeadCell>
-            </Table.Head>
-            <Table.Body className="divide-y">
-              {prePayrolls.length > 0 ? (
-                prePayrolls.map((prePayroll, i) => {
-                  return (
-                    <Table.Row
-                      key={i}
-                      className="bg-white dark:border-gray-700 dark:bg-gray-800"
-                    >
-                      <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
-                        {prePayroll.id}
-                      </Table.Cell>
-                      <Table.Cell className="text-center">
-                        {`${prePayroll.month} de ${prePayroll.year}`}
-                      </Table.Cell>
-                      <Table.Cell>
-                        <div className="flex justify-center gap-4">
-                          <Link
-                            to={`${ROUTE_PRE_PAYROLL_DETAILS_PREFIX}/${prePayroll.id}`}
-                          >
-                            <button
-                              type="button"
-                              className="font-medium text-cyan-600 dark:text-cyan-500"
+          <div className="w-full overflow-x-auto">
+            <Table theme={customTheme}>
+              <Table.Head>
+                <Table.HeadCell className="text-center">ID</Table.HeadCell>
+                <Table.HeadCell className="text-center">
+                  Mes / Año
+                </Table.HeadCell>
+                <Table.HeadCell className="text-center">
+                  Acciones
+                </Table.HeadCell>
+              </Table.Head>
+              <Table.Body className="divide-y">
+                {prePayrolls.length > 0 ? (
+                  prePayrolls.map((prePayroll, i) => {
+                    return (
+                      <Table.Row
+                        key={i}
+                        className="bg-white dark:border-gray-700 dark:bg-gray-800"
+                      >
+                        <Table.Cell className="whitespace-nowrap text-center font-medium text-gray-900 dark:text-white">
+                          {prePayroll.id}
+                        </Table.Cell>
+                        <Table.Cell className="text-center">
+                          {`${prePayroll.month} de ${prePayroll.year}`}
+                        </Table.Cell>
+                        <Table.Cell>
+                          <div className="flex justify-center gap-4">
+                            <Link
+                              to={`${ROUTE_PRE_PAYROLL_DETAILS_PREFIX}/${prePayroll.id}`}
                             >
-                              Ver detalles
-                            </button>
-                          </Link>
-                        </div>
-                      </Table.Cell>
-                    </Table.Row>
-                  );
-                })
-              ) : (
-                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                  <Table.Cell className="text-center bg-gray-50" colSpan={3}>
-                    No hay prenóminas disponibles
-                  </Table.Cell>
-                </Table.Row>
-              )}
-            </Table.Body>
-          </Table>
+                              <button
+                                type="button"
+                                className="font-medium text-cyan-600 dark:text-cyan-500"
+                              >
+                                Ver detalles
+                              </button>
+                            </Link>
+                          </div>
+                        </Table.Cell>
+                      </Table.Row>
+                    );
+                  })
+                ) : (
+                  <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                    <Table.Cell className="text-center bg-gray-50" colSpan={3}>
+                      No hay prenóminas disponibles
+                    </Table.Cell>
+                  </Table.Row>
+                )}
+              </Table.Body>
+            </Table>
+          </div>
         )}
       </div>
     </>
