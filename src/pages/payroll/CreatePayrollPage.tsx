@@ -27,9 +27,11 @@ import { useEffect, useState } from "react";
 
 import { ERROR_MESSAGES } from "../../constants/app";
 import { FaSave } from "react-icons/fa";
+import { GET_LIST_TAXS } from "../../constants/endpoints/tax";
 import { GET_LIST_USERS } from "../../constants/endpoints/user";
 import { HiHome } from "react-icons/hi";
 import { POST_CREATE_PAYROLL } from "../../constants/endpoints/payrolls";
+import { Tax } from "../../constants/types/tax";
 import { User } from "../../constants/types/user";
 import axios from "axios";
 import { toDecimal } from "../../services/app";
@@ -55,6 +57,7 @@ type ErrorPayrollForm = {
 const CreatePayrollPage = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
+  const [taxs, setTaxs] = useState<Tax[]>([]);
   const [prePayrollSelected, setPrePayrollSelected] =
     useState<PrePayrollBaseWithId>();
   const [prePayrolls, setPrePayrolls] = useState<PrePayrollBaseWithId[]>();
@@ -85,6 +88,9 @@ const CreatePayrollPage = () => {
     });
     axios.get(GET_LIST_USERS).then(({ data }) => {
       setUsers(data);
+    });
+    axios.get(GET_LIST_TAXS).then(({ data }) => {
+      setTaxs(data);
     });
   }, []);
 
@@ -238,6 +244,39 @@ const CreatePayrollPage = () => {
     }
   };
 
+  const calcRet = (earnedSalary: number) => {
+    if (!taxs) return 0;
+    const segSocialTax = taxs.filter(
+      (tax) =>
+        tax.type === "seguridad social" &&
+        tax.minValue <= earnedSalary &&
+        tax.maxValue >= earnedSalary
+    )[0];
+
+    const ingPersTax = taxs.filter(
+      (tax) =>
+        tax.type === "ingresos personales" &&
+        tax.minValue <= earnedSalary &&
+        tax.maxValue >= earnedSalary
+    )[0];
+
+    let segSocial = 0;
+
+    if (segSocialTax) {
+      segSocial =
+        ((earnedSalary - segSocialTax.minValue) * segSocialTax.percentage) /
+        100;
+    }
+
+    let ingPers = 0;
+
+    if (ingPersTax) {
+      ingPers = ingPersTax.percentage / 100;
+    }
+
+    return segSocial + ingPers;
+  };
+
   const calcPayroll = (prePayrollWorkers: PrePayrollWorkerTable[]) => {
     if (!prePayrollSelected) return;
 
@@ -268,7 +307,7 @@ const CreatePayrollPage = () => {
       const provicion = toDecimal((fondoSalario * 1.5) / 100);
       const totalGasto = toDecimal(fuerzaTrabajo + segSocial + provicion);
 
-      const ret = 0;
+      const ret = calcRet(earnedSalary);
 
       const paid = toDecimal(earnedSalary - totalGasto - ret);
 
